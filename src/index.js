@@ -9,6 +9,17 @@ export default {
       return handleEnquiry(request, env, url);
     }
 
+    // Do not publish deployment configuration, migrations, or Worker source files.
+    if (
+      url.pathname === "/README.md" ||
+      url.pathname === "/wrangler.toml" ||
+      url.pathname.startsWith("/src/") ||
+      url.pathname.startsWith("/migrations/") ||
+      url.pathname.startsWith("/.github/")
+    ) {
+      return new Response("Not found", { status: 404 });
+    }
+
     // Serve the existing static website without changing its routes.
     return env.ASSETS.fetch(request);
   }
