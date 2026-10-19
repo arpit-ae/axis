@@ -1,0 +1,14 @@
+name = "goaxis"
+main = "src/index.js"
+compatibility_date = "2026-10-19"
+
+[assets]
+directory = "."
+binding = "ASSETS"
+run_worker_first = ["/api/*", "/src/*", "/migrations/*", "/README.md", "/wrangler.toml", "/.github/*"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "goaxis-consultancy-db"
+database_id = "f81de195-6559-486c-b6a9-be4fac6e5111"
+migrations_dir = "migrations"

@@ -1,22 +1,28 @@
-# GOAXIS CONSULTANCY — Cloudflare Pages static deployment
+# GOAXIS CONSULTANCY — Phase 1 Working Forms
 
-This repository is configured as a **static frontend** for Cloudflare Pages. It does not include a production backend, secure authentication, enquiry storage, admin API, or verified payment processing.
+Repository: `arpit-ae/axis`. The public site is served as static assets by a Cloudflare Worker; Phase 1 adds a Worker API route at `POST /api/enquiry` and a D1 `Leads` table.
 
-## Cloudflare Pages settings
-- Connect GitHub repository: `arpit-ae/axis`
-- Production branch: `main`
-- Framework preset: `None`
-- Build command: leave blank (or `exit 0` if the dashboard requires a command)
-- Build output directory: `/` (repository root; in Cloudflare's UI use `.` if accepted)
-- Root directory: leave blank
+## Files added
+- `src/index.js`: Worker API plus static asset fallback.
+- `forms.js`: sends the homepage and service quotation forms to the API.
+- `migrations/0001_phase1_enquiries.sql`: creates the enquiry table and indexes.
+- `wrangler.toml`: Worker asset and D1 binding configuration.
 
-Cloudflare Pages will rebuild automatically when commits land on `main`. Do **not** use `npx wrangler deploy` for this static Pages site; that command targets Workers. If deploying from CLI, use `npx wrangler pages deploy . --project-name=goaxis-consultancy --branch=main` after authenticating Wrangler and confirming the Pages project name.
+## Safety before production
+- Confirm this Wrangler config targets the intended Cloudflare account and existing `goaxis` Worker.
+- Confirm the D1 database ID in Cloudflare before applying migrations.
+- Apply the D1 migration only after checking existing migration/table state.
+- Preview-test the homepage and service forms, and verify their records in D1.
+- Review and complete the Privacy Policy and Terms before collecting real customer information.
+- The customer login/signup and admin pages remain prototypes; this phase does not implement secure authentication, admin access, payments or a customer dashboard.
+- Do not run a production deploy until the binding and migration have been verified.
 
-## Before accepting real customers/payments
-- Replace placeholder contact details and review draft Terms/Privacy pages.
-- Build and configure a server-side API for enquiry submissions, customer accounts and admin access.
-- Configure verified payment-gateway webhooks; never trust a browser return URL as proof of payment.
-- Add Cloudflare Pages Functions/Workers and configure D1/R2 bindings and secrets only when backend code is ready.
-- Do not treat the demo login/signup pages as secure authentication.
+## Suggested local checks
+```sh
+node --check app.js
+node --check forms.js
+node --check part2.js
+node --check src/index.js
+```
 
-The enquiry forms are preview-only and do not transmit or save personal information. The admin page is only a shell and must not be used for real operations.
+Production uses Cloudflare Worker static assets. The API handles `/api/*`; other requests are passed to the existing static asset service.
