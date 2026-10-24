@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /dashboard.html
+Disallow: /login.html
+Disallow: /signup.html
+Disallow: /payment-return.html
+
+Sitemap: https://goaxis.in/sitemap.xml

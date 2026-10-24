@@ -1,0 +1,9 @@
+{
+  "name": "GOAXIS CONSULTANCY",
+  "short_name": "GOAXIS",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#ffffff",
+  "theme_color": "#102a43",
+  "icons": [{"src": "/assets/favicon.svg", "sizes": "any", "type": "image/svg+xml"}]
+}
