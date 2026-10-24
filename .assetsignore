@@ -1,0 +1,20 @@
+# Repository and deployment metadata must never be published as website assets.
+.git/
+.github/
+.assetsignore
+
+# Server-side source and operational files are handled by the Worker, not served publicly.
+src/
+migrations/
+wrangler.toml
+README.md
+
+# Internal prototype pages are not part of the public site.
+admin.html
+admin.js
+dashboard.html
+login.html
+signup.html
+part3.css
+part3.js
+payment-return.html
