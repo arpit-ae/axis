@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#102a43">
+<title>Pay Now — GOAXIS CONSULTANCY</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+<script src="app.js" defer></script>
+<script src="payment.js" defer></script>
+<script src="whatsapp.js" defer></script>
+<style>
+.pay-shell{max-width:760px;margin:4rem auto}.pay-card{background:#fff;border:1px solid #d9e2ec;border-radius:22px;padding:2rem;box-shadow:0 16px 45px rgba(16,42,67,.09)}.pay-card h1{margin:.25rem 0 .65rem}.pay-card .intro{max-width:600px}.pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.pay-field{display:flex;flex-direction:column;gap:.4rem}.pay-field.full{grid-column:1/-1}.pay-field label{font-weight:700}.pay-field input,.pay-field textarea{width:100%;padding:.85rem 1rem;border:1px solid #bcccdc;border-radius:10px;font:inherit}.pay-field input:focus,.pay-field textarea:focus{outline:3px solid rgba(46,125,255,.15);border-color:#2e7dff}.pay-actions{margin-top:1.25rem;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}.pay-note{font-size:.88rem;color:#627d98}.pay-error{color:#b42318;font-weight:600}.pay-success{color:#067647;font-weight:600}@media(max-width:650px){.pay-shell{margin:2rem auto}.pay-card{padding:1.25rem}.pay-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="site-header"><div class="container nav-wrap"><a class="brand" href="index.html" aria-label="GOAXIS Consultancy home"><span class="brand-mark">G<span>.</span></span><span class="brand-copy"><strong>GOAXIS</strong><small>CONSULTANCY</small></span></a><a class="button button-secondary" href="index.html">← Back to website</a></div></header>
+<main class="container pay-shell">
+<section class="pay-card">
+<p class="eyebrow">SECURE ONLINE PAYMENT</p>
+<h1>Pay GOAXIS</h1>
+<p class="intro">Enter the amount agreed with GOAXIS and continue to secure checkout. You can pay using the payment methods available in Cashfree checkout.</p>
+<form id="payment-form" novalidate>
+<div class="pay-grid">
+<div class="pay-field"><label for="customer-name">Name *</label><input id="customer-name" name="name" autocomplete="name" required></div>
+<div class="pay-field"><label for="customer-phone">Mobile *</label><input id="customer-phone" name="phone" inputmode="tel" autocomplete="tel" required></div>
+<div class="pay-field"><label for="customer-email">Email *</label><input id="customer-email" name="email" type="email" autocomplete="email" required></div>
+<div class="pay-field"><label for="amount">Amount (₹) *</label><input id="amount" name="amount" type="number" min="1" step="0.01" inputmode="decimal" placeholder="e.g. 1500" required></div>
+<div class="pay-field full"><label for="purpose">Payment purpose / Service *</label><input id="purpose" name="purpose" placeholder="e.g. Website development, GST assistance" required></div>
+</div>
+<div class="pay-actions"><button class="button" id="pay-button" type="submit">Pay Now →</button><span id="payment-message" class="pay-note" role="status"></span></div>
+<p class="pay-note">You will be redirected to Cashfree's secure checkout. Do not refresh while payment is being processed.</p>
+</form>
+</section>
+</main>
+</body>
+</html>
