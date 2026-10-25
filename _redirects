@@ -1,1 +1,4 @@
 /home / 301
+/api/cashfree/create-order /.netlify/functions/cashfree-create-order 200
+/api/cashfree/order/:order_id /.netlify/functions/cashfree-order?order_id=:order_id 200
+/api/cashfree/webhook /.netlify/functions/cashfree-webhook 200
