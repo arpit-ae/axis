@@ -18,6 +18,8 @@ jobs:
           node --check forms.js
           node --check part2.js
           node --check src/index.js
+          node --check src/auth.js
+          node --check portal.js
       - name: Check Phase 1 wiring
         run: |
           grep -q 'src="forms.js" defer' index.html

@@ -26,3 +26,20 @@ node --check src/index.js
 ```
 
 Production uses Cloudflare Worker static assets. The API handles `/api/*`; other requests are passed to the existing static asset service.
+## Phase 2: Customer and admin login
+
+- `src/auth.js`: signup, login, logout, session (`/api/auth/*`), customer enquiries (`/api/my/enquiries`) and admin APIs (`/api/admin/*`).
+- `migrations/0002_auth.sql`: `Users`, `Sessions`, `LoginAttempts` tables and `Leads.admin_note`.
+- `login.html` (login + create account), `dashboard.html` (customer), `admin.html` (admin), `portal.js`, `portal.css`.
+- Passwords are PBKDF2-SHA256 hashed; sessions are HttpOnly, Secure, SameSite=Lax cookies; 10 failed logins per IP per 15 minutes are blocked.
+
+### Deploy steps
+
+```
+npx wrangler d1 migrations apply goaxis-consultancy-db --remote
+npx wrangler secret put ADMIN_EMAIL      # e.g. goaxis.in@gmail.com
+npx wrangler secret put ADMIN_PASSWORD   # long, unique password
+npx wrangler deploy
+```
+
+Customers see enquiries that were sent with the same email as their account. Email verification is not added yet.

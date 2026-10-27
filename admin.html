@@ -1,5 +1,22 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Admin Console — GOAXIS</title><link rel="stylesheet" href="styles.css"><style>.admin-wrap{max-width:1200px;margin:3rem auto;padding:0 1rem}.admin-card{background:#fff;border:1px solid #dfe6ee;border-radius:14px;padding:1rem;margin:1rem 0;overflow:auto}.admin-table{width:100%;border-collapse:collapse;font-size:.9rem}.admin-table th,.admin-table td{padding:.65rem;border-bottom:1px solid #e7edf3;text-align:left;vertical-align:top}.admin-table input,.admin-table select,.admin-table button{padding:.45rem;max-width:190px}.feedback{padding:.8rem;background:#f1f5f9;border-radius:8px}.hidden{display:none}</style><script src="admin.js" defer></script>  <script src="whatsapp.js" defer></script>
-</head>
-<body><header class="site-header"><div class="container nav-wrap"><a class="brand" href="index.html"><span class="brand-mark">G<span>.</span></span><span class="brand-copy"><strong>GOAXIS</strong><small>CONSULTANCY</small></span></a><nav class="nav-links account-nav"><a href="index.html">Public website</a><button id="refresh" class="button button-small" type="button">Refresh</button><button id="logout" class="button button-small" type="button">Log out</button></nav></div></header>
-<main class="admin-wrap"><p class="eyebrow">RESTRICTED · ADMIN ONLY</p><h1>Operations console</h1><p class="muted">Review orders, approve quotations, and inspect enquiries. The API verifies admin permissions.</p><p id="feedback" class="feedback" role="status">Checking admin session…</p><section id="content" class="hidden"><div class="admin-card"><h2>Orders and quotation approval</h2><div id="orders">Loading…</div></div><div class="admin-card"><h2>Enquiries</h2><div id="leads">Loading…</div></div><div class="admin-card"><h2>Customer accounts</h2><div id="users">Loading…</div></div></section></main></body></html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#102a43"><link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="portal.css"><title>Admin | GOAXIS CONSULTANCY</title><script src="portal.js" defer></script></head>
+<body class="account-page portal-page" data-portal="admin"><header class="site-header"><div class="container nav-wrap"><a class="brand" href="index.html" aria-label="GOAXIS Consultancy home"><span class="brand-mark">G<span>.</span></span><span class="brand-copy"><strong>GOAXIS</strong><small>CONSULTANCY</small></span></a><nav class="portal-nav"><a href="index.html">Home</a><a href="services.html">Services</a><a href="index.html#contact">Contact</a></nav></div></header>
+<main class="container portal-shell" id="admin-login-wrap"><section class="portal-card">
+<form id="admin-login-form" class="portal-form" novalidate>
+<p class="eyebrow">ADMIN</p><h1>Admin login.</h1><p class="portal-sub">For the GOAXIS team only.</p>
+<label>Admin email<input name="email" type="email" autocomplete="username" required maxlength="254"></label>
+<label>Password<input name="password" type="password" autocomplete="current-password" required maxlength="128"></label>
+<button class="button portal-submit" type="submit">Log in →</button>
+<p class="portal-msg" role="status" aria-live="polite"></p>
+</form></section></main>
+
+<main class="container portal-shell portal-wide" id="admin-panel" hidden><section class="portal-card">
+<div class="portal-head"><div><p class="eyebrow">ADMIN DASHBOARD</p><h1>Enquiries &amp; customers</h1></div><button type="button" class="button button-secondary button-small" id="logout-btn">Log out</button></div>
+<div class="portal-stats" id="lead-stats"></div>
+<div class="portal-tabs"><button type="button" data-admin-tab="leads" class="active">Enquiries</button><button type="button" data-admin-tab="users">Customers</button></div>
+<div data-admin-panel="leads">
+<form id="lead-filter" class="portal-filter"><input name="q" type="search" placeholder="Search name, email, phone, reference"><select name="status"><option value="">All statuses</option></select><button class="button button-small" type="submit">Filter</button></form>
+<div id="leads"><p class="portal-sub">Loading…</p></div>
+</div>
+<div data-admin-panel="users" hidden><div id="users"><p class="portal-sub">Loading…</p></div></div>
+</section></main></body></html>

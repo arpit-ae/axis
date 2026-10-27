@@ -1,4 +1,28 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Customer Portal Coming Soon | GOAXIS CONSULTANCY</title><link rel="stylesheet" href="styles.css">  <script src="whatsapp.js" defer></script>
-</head>
-<body class="account-page"><header class="site-header"><div class="container nav-wrap"><a class="brand" href="index.html"><span class="brand-mark">G<span>.</span></span><span class="brand-copy"><strong>GOAXIS</strong><small>CONSULTANCY</small></span></a><a href="index.html">Home</a></div></header><main class="container account-shell login-shell"><section class="account-card"><p class="eyebrow">CUSTOMER PORTAL</p><h1>Coming soon.</h1><p>The GOAXIS customer portal is being prepared. Secure customer accounts are not available yet, so please do not enter a password or personal documents on this website.</p><p><a class="button" href="index.html#contact">Send an enquiry →</a></p><p><a class="text-link" href="services.html">Explore services →</a></p></section></main><footer class="site-footer"><div class="container footer-bottom"><span>© <span id="current-year">2026</span> GOAXIS CONSULTANCY</span><a href="index.html">Home</a></div></footer><script src="app.js"></script></body></html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#102a43"><link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="portal.css"><title>Login | GOAXIS CONSULTANCY</title><script src="portal.js" defer></script></head>
+<body class="account-page portal-page" data-portal="login"><header class="site-header"><div class="container nav-wrap"><a class="brand" href="index.html" aria-label="GOAXIS Consultancy home"><span class="brand-mark">G<span>.</span></span><span class="brand-copy"><strong>GOAXIS</strong><small>CONSULTANCY</small></span></a><nav class="portal-nav"><a href="index.html">Home</a><a href="services.html">Services</a><a href="index.html#contact">Contact</a></nav></div></header>
+<main class="container portal-shell"><section class="portal-card">
+<p class="eyebrow">CUSTOMER PORTAL</p>
+<div class="portal-tabs" role="tablist"><button type="button" role="tab" data-tab="login" class="active">Login</button><button type="button" role="tab" data-tab="signup">Create account</button></div>
+
+<form id="login-form" class="portal-form" data-panel="login" novalidate>
+<h1>Welcome back.</h1><p class="portal-sub">Log in to track your enquiries and applications.</p>
+<label>Email address<input name="email" type="email" autocomplete="email" required maxlength="254" placeholder="you@example.com"></label>
+<label>Password<input name="password" type="password" autocomplete="current-password" required minlength="8" maxlength="128"></label>
+<button class="button portal-submit" type="submit">Log in →</button>
+<p class="portal-msg" role="status" aria-live="polite"></p>
+</form>
+
+<form id="signup-form" class="portal-form" data-panel="signup" hidden novalidate>
+<h1>Create your account.</h1><p class="portal-sub">Use the same email you used for your enquiry so we can show it in your dashboard.</p>
+<label>Full name<input name="name" autocomplete="name" required maxlength="100" placeholder="Your name"></label>
+<label>Email address<input name="email" type="email" autocomplete="email" required maxlength="254" placeholder="you@example.com"></label>
+<label>Phone (optional)<input name="phone" type="tel" autocomplete="tel" maxlength="25" placeholder="+91"></label>
+<label>Password<input name="password" type="password" autocomplete="new-password" required minlength="8" maxlength="128" placeholder="At least 8 characters"></label>
+<label>Confirm password<input name="confirm" type="password" autocomplete="new-password" required minlength="8" maxlength="128"></label>
+<label class="portal-check"><input name="consent" type="checkbox" required> I agree to the <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</label>
+<button class="button portal-submit" type="submit">Create account →</button>
+<p class="portal-msg" role="status" aria-live="polite"></p>
+</form>
+<p class="portal-foot">GOAXIS team? <a href="admin.html">Admin login</a></p>
+</section></main></body></html>
