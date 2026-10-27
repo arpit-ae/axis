@@ -1,3 +1,5 @@
+import { handleAuthRoute } from "./auth.js";
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -7,6 +9,14 @@ export default {
         return json({ ok: false, error: "Method not allowed." }, 405, { Allow: "POST" });
       }
       return handleEnquiry(request, env, url);
+    }
+
+    if (
+      url.pathname.startsWith("/api/auth/") ||
+      url.pathname.startsWith("/api/my/") ||
+      url.pathname.startsWith("/api/admin/")
+    ) {
+      return handleAuthRoute(request, env, url);
     }
 
     if (url.pathname === "/api/cashfree/create-order") {
