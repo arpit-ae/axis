@@ -31,9 +31,11 @@
 
     const data = new FormData(form);
     const amount = Number(data.get('amount'));
-    const phone = String(data.get('phone') || '').replace(/\D/g, '');
-    if (!Number.isFinite(amount) || amount < 1) return setMessage('Please enter a valid amount.', 'pay-error');
-    if (phone.length < 10) return setMessage('Please enter a valid mobile number.', 'pay-error');
+    const suppliedPhone = String(data.get('phone') || '').trim();
+    let phone = suppliedPhone.replace(/\D/g, '');
+    if (phone.length === 12 && phone.startsWith('91')) phone = phone.slice(2);
+    if (!Number.isFinite(amount) || amount < 1 || amount > 1000000) return setMessage('Enter an amount between ₹1 and ₹10,00,000.', 'pay-error');
+    if (!/^[6-9]\d{9}$/.test(phone)) return setMessage('Enter a valid 10-digit Indian mobile number starting with 6, 7, 8 or 9. You may include +91.', 'pay-error');
 
     button.disabled = true;
     button.textContent = 'Creating secure payment…';
@@ -57,14 +59,19 @@
       if (!response.ok) throw new Error(result.error || `Could not create payment order (HTTP ${response.status}).`);
       if (!result.payment_session_id || !result.order_id) throw new Error('Cashfree did not return a payment session.');
 
-      sessionStorage.setItem('goaxis_payment_customer', JSON.stringify({
-        name: String(data.get('name')).trim(),
-        phone,
-        email: String(data.get('email')).trim(),
-        amount: amount.toFixed(2),
-        purpose: String(data.get('purpose')).trim(),
-        orderId: result.order_id
-      }));
+      // Session storage is only a convenience for the return page; payment must still work if storage is blocked.
+      try {
+        sessionStorage.setItem('goaxis_payment_customer', JSON.stringify({
+          name: String(data.get('name')).trim(),
+          phone,
+          email: String(data.get('email')).trim(),
+          amount: amount.toFixed(2),
+          purpose: String(data.get('purpose')).trim(),
+          orderId: result.order_id
+        }));
+      } catch (storageError) {
+        console.warn('GOAXIS session storage unavailable; continuing checkout without saved form details.');
+      }
 
       const script = document.createElement('script');
       script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
