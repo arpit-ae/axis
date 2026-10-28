@@ -5,7 +5,7 @@ compatibility_date = "2026-10-19"
 [assets]
 directory = "."
 binding = "ASSETS"
-run_worker_first = ["/api/*", "/src/*", "/migrations/*", "/README.md", "/wrangler.toml", "/.github/*", "/netlify/*", "/admin.html", "/admin.js", "/dashboard.html", "/login.html", "/signup.html"]
+run_worker_first = ["/api/*", "/src/*", "/migrations/*", "/README.md", "/PAYMENT_SETUP.md", "/wrangler.toml", "/.github/*", "/netlify/*", "/admin.html", "/admin.js", "/dashboard.html", "/login.html", "/signup.html"]
 
 [[d1_databases]]
 binding = "DB"
