@@ -37,7 +37,9 @@ export default {
       url.pathname === "/wrangler.toml" ||
       url.pathname.startsWith("/src/") ||
       url.pathname.startsWith("/migrations/") ||
-      url.pathname.startsWith("/.github/")
+      url.pathname.startsWith("/.github/") ||
+      url.pathname.startsWith("/netlify/") ||
+      ["/admin.html", "/admin.js", "/dashboard.html", "/login.html", "/signup.html"].includes(url.pathname)
     ) {
       return new Response("Not found", { status: 404 });
     }
@@ -127,6 +129,8 @@ async function handleCashfreeCreateOrder(request, env, url) {
   if (!contentType.toLowerCase().includes("application/json")) {
     return json({ ok: false, error: "Send payment details as JSON." }, 415);
   }
+  const length = Number(request.headers.get("Content-Length") || 0);
+  if (length > 12000) return json({ ok: false, error: "Payment request is too large." }, 413);
 
   let data;
   try {
@@ -135,15 +139,22 @@ async function handleCashfreeCreateOrder(request, env, url) {
     return json({ ok: false, error: "Invalid payment request." }, 400);
   }
 
-  const name = clean(data?.name, 100);
-  const email = clean(data?.email, 254).toLowerCase();
-  const phone = clean(data?.phone, 20).replace(/\D/g, "");
-  const purpose = clean(data?.purpose, 200);
-  const amount = Number(data?.amount);
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    return json({ ok: false, error: "Invalid payment request." }, 400);
+  }
+
+  const name = clean(data.name, 100);
+  const email = clean(data.email, 254).toLowerCase();
+  const suppliedPhone = clean(data.phone, 30);
+  let phone = suppliedPhone.replace(/\D/g, "");
+  // Accept either a 10-digit Indian mobile or the same number prefixed by country code 91.
+  if (phone.length === 12 && phone.startsWith("91")) phone = phone.slice(2);
+  const purpose = clean(data.purpose, 200);
+  const amount = Number(data.amount);
 
   if (name.length < 2) return json({ ok: false, error: "Please enter your full name." }, 400);
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json({ ok: false, error: "Please enter a valid email address." }, 400);
-  if (!/^\d{10,15}$/.test(phone)) return json({ ok: false, error: "Please enter a valid mobile number." }, 400);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return json({ ok: false, error: "Please enter a valid email address." }, 400);
+  if (!/^[6-9]\d{9}$/.test(phone)) return json({ ok: false, error: "Enter a valid 10-digit Indian mobile number starting with 6, 7, 8 or 9. You may include +91." }, 400);
   if (!purpose) return json({ ok: false, error: "Please enter the payment purpose." }, 400);
   if (!Number.isFinite(amount) || amount < 1 || amount > 1000000) {
     return json({ ok: false, error: "Payment amount must be between ₹1 and ₹10,00,000." }, 400);
@@ -186,8 +197,19 @@ async function handleCashfreeCreateOrder(request, env, url) {
 
     const result = await response.json().catch(() => ({}));
     if (!response.ok || !result.payment_session_id) {
-      console.error("Cashfree create order failed", response.status, result);
-      return json({ ok: false, error: "Cashfree could not create the payment order. Please try again." }, 502);
+      // Never log the full Cashfree response: validation messages can contain customer phone/email data.
+      const code = typeof result?.code === "string" ? result.code.slice(0, 120) : "missing_payment_session_id";
+      console.error("Cashfree create order failed", { httpStatus: response.status, code });
+      if (code === "customer_details.customer_phone_invalid") {
+        return json({ ok: false, error: "Enter a valid 10-digit Indian mobile number starting with 6, 7, 8 or 9. You may include +91." }, 400);
+      }
+      if (response.status === 400) {
+        return json({ ok: false, error: "Cashfree rejected the payment details. Check the name, mobile number, email and amount, then try again." }, 400);
+      }
+      if (response.status === 401 || response.status === 403) {
+        return json({ ok: false, error: "The payment service could not authorize this request. Please contact GOAXIS support." }, 502);
+      }
+      return json({ ok: false, error: "The payment service could not create an order. Please try again in a moment. No payment was taken." }, 502);
     }
 
     return json({
@@ -222,7 +244,13 @@ async function handleCashfreeOrderStatus(orderId, env) {
       }
     });
     const result = await response.json().catch(() => ({}));
-    if (!response.ok) return json({ ok: false, error: "Could not verify the Cashfree order." }, 502);
+    if (!response.ok) {
+      console.error("Cashfree order status lookup failed", {
+        httpStatus: response.status,
+        code: typeof result?.code === "string" ? result.code.slice(0, 120) : "unknown"
+      });
+      return json({ ok: false, error: "Could not verify the payment status right now. Please refresh in a moment or contact GOAXIS." }, 502);
+    }
 
     return json({
       ok: true,
