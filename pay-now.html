@@ -23,11 +23,11 @@
 <p class="intro">Enter the amount agreed with GOAXIS and continue to secure checkout. You can pay using the payment methods available in Cashfree checkout.</p>
 <form id="payment-form" novalidate>
 <div class="pay-grid">
-<div class="pay-field"><label for="customer-name">Name *</label><input id="customer-name" name="name" autocomplete="name" required></div>
-<div class="pay-field"><label for="customer-phone">Mobile *</label><input id="customer-phone" name="phone" inputmode="tel" autocomplete="tel" required></div>
-<div class="pay-field"><label for="customer-email">Email *</label><input id="customer-email" name="email" type="email" autocomplete="email" required></div>
-<div class="pay-field"><label for="amount">Amount (₹) *</label><input id="amount" name="amount" type="number" min="1" step="0.01" inputmode="decimal" placeholder="e.g. 1500" required></div>
-<div class="pay-field full"><label for="purpose">Payment purpose / Service *</label><input id="purpose" name="purpose" placeholder="e.g. Website development, GST assistance" required></div>
+<div class="pay-field"><label for="customer-name">Name *</label><input id="customer-name" name="name" autocomplete="name" maxlength="100" required></div>
+<div class="pay-field"><label for="customer-phone">Mobile *</label><input id="customer-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="16" pattern="(?:\+?91[ -]?)?[6-9][0-9]{9}" title="Enter a valid 10-digit Indian mobile number starting with 6, 7, 8 or 9. You may optionally include +91." placeholder="9876543210" required></div>
+<div class="pay-field"><label for="customer-email">Email *</label><input id="customer-email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
+<div class="pay-field"><label for="amount">Amount (₹) *</label><input id="amount" name="amount" type="number" min="1" max="1000000" step="0.01" inputmode="decimal" placeholder="e.g. 1500" required></div>
+<div class="pay-field full"><label for="purpose">Payment purpose / Service *</label><input id="purpose" name="purpose" maxlength="200" placeholder="e.g. Website development, GST assistance" required></div>
 </div>
 <div class="pay-actions"><button class="button" id="pay-button" type="submit">Pay Now →</button><span id="payment-message" class="pay-note" role="status"></span></div>
 <p class="pay-note">You will be redirected to Cashfree's secure checkout. Do not refresh while payment is being processed.</p>
