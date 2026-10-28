@@ -34,6 +34,7 @@ export default {
     // Do not publish deployment configuration, migrations, or Worker source files.
     if (
       url.pathname === "/README.md" ||
+      url.pathname === "/PAYMENT_SETUP.md" ||
       url.pathname === "/wrangler.toml" ||
       url.pathname.startsWith("/src/") ||
       url.pathname.startsWith("/migrations/") ||
@@ -332,6 +333,13 @@ function clean(value, maxLength) {
 function json(body, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", ...extraHeaders }
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      ...extraHeaders
+    }
   });
 }
