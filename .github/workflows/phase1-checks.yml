@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [feature/phase1-working-forms]
+    branches: [main, feature/phase1-working-forms]
 jobs:
   syntax-and-wiring:
     runs-on: ubuntu-latest
@@ -17,6 +17,9 @@ jobs:
           node --check app.js
           node --check forms.js
           node --check part2.js
+          node --check payment.js
+          node --check whatsapp.js
+          node --check admin.js
           node --check src/index.js
       - name: Check Phase 1 wiring
         run: |
@@ -26,3 +29,10 @@ jobs:
           grep -q 'id="service-enquiry-form"' service.html
           grep -q 'POST /api/enquiry' README.md
           grep -q 'CREATE TABLE IF NOT EXISTS Leads' migrations/0001_phase1_enquiries.sql
+          grep -q 'customer_details.customer_phone_invalid' src/index.js
+          grep -q 'payment-return.html?order_id=' src/index.js
+          grep -q 'service-price' service.html
+          grep -q 'netlify/' .assetsignore
+          ! grep -q '^payment-return.html
+ .assetsignore
+          grep -q 'Cloudflare' PAYMENT_SETUP.md
