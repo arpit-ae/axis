@@ -33,6 +33,5 @@ jobs:
           grep -q 'payment-return.html?order_id=' src/index.js
           grep -q 'service-price' service.html
           grep -q 'netlify/' .assetsignore
-          ! grep -q '^payment-return.html
- .assetsignore
+          if grep -qxF "payment-return.html" .assetsignore; then echo "payment return page must be uploaded as an asset"; exit 1; fi
           grep -q 'Cloudflare' PAYMENT_SETUP.md
