@@ -17,4 +17,6 @@ login.html
 signup.html
 part3.css
 part3.js
-payment-return.html
+
+# Legacy serverless functions are not deployed on Cloudflare Workers.
+netlify/
