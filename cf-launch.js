@@ -25,34 +25,6 @@
     resetButton();
   };
 
-  const loadCashfreeSdk = () => {
-    if (typeof window.Cashfree === 'function') return Promise.resolve();
-
-    return new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      const timeout = setTimeout(() => {
-        script.remove();
-        reject(new Error('Cashfree checkout could not load. Please disable any ad/content blocker for this page or try another browser.'));
-      }, 10000);
-
-      script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
-      script.async = true;
-      script.onload = () => {
-        clearTimeout(timeout);
-        if (typeof window.Cashfree !== 'function') {
-          reject(new Error('Cashfree checkout could not initialise. Please try again.'));
-          return;
-        }
-        resolve();
-      };
-      script.onerror = () => {
-        clearTimeout(timeout);
-        reject(new Error('Cashfree checkout could not load. Please check your connection or browser extensions, then retry.'));
-      };
-      document.head.appendChild(script);
-    });
-  };
-
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!form.reportValidity()) return;
@@ -101,16 +73,23 @@
         console.warn('GOAXIS session storage unavailable; continuing checkout without saved form details.');
       }
 
-      await loadCashfreeSdk();
+      if (typeof window.Cashfree !== 'function') {
+        throw new Error('Cashfree checkout did not load. Disable any ad/content blocker for sdk.cashfree.com, reload this page, and try again.');
+      }
+
       const cashfree = window.Cashfree({
         mode: result.environment === 'sandbox' ? 'sandbox' : 'production'
       });
-      // Cashfree's hosted checkout owns the navigation. Do not await it: the SDK
-      // can leave the page in a loading state while a browser extension blocks it.
+      // The hosted checkout owns the same-tab navigation. Do not await it:
+      // a redirect checkout does not resolve before the page leaves this site.
       button.textContent = 'Opening secure checkout…';
-      cashfree.checkout({
-        paymentSessionId: result.payment_session_id
+      const checkoutResult = cashfree.checkout({
+        paymentSessionId: result.payment_session_id,
+        redirectTarget: '_self'
       });
+      if (checkoutResult && typeof checkoutResult.catch === 'function') {
+        checkoutResult.catch(showPaymentError);
+      }
     } catch (error) {
       showPaymentError(error);
     }
