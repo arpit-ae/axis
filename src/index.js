@@ -174,7 +174,7 @@ async function handleCashfreeCreateOrder(request, env, url) {
       customer_id: `CUST_${phone}_${crypto.randomUUID().replace(/-/g, "").slice(0, 8)}`,
       customer_name: name,
       customer_email: email,
-      customer_phone: phone
+      customer_phone: `+91${phone}`
     },
     order_note: purpose.slice(0, 200),
     order_meta: {
