@@ -105,9 +105,11 @@
       const cashfree = window.Cashfree({
         mode: result.environment === 'sandbox' ? 'sandbox' : 'production'
       });
-      await cashfree.checkout({
-        paymentSessionId: result.payment_session_id,
-        redirectTarget: '_modal'
+      // Cashfree's hosted checkout owns the navigation. Do not await it: the SDK
+      // can leave the page in a loading state while a browser extension blocks it.
+      button.textContent = 'Opening secure checkout…';
+      cashfree.checkout({
+        paymentSessionId: result.payment_session_id
       });
     } catch (error) {
       showPaymentError(error);
