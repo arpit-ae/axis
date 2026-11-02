@@ -98,7 +98,18 @@
         redirectTarget: '_self'
       });
       if (checkoutResult && typeof checkoutResult.then === 'function') {
-        checkoutResult.then(() => clearTimeout(checkoutWatchdog)).catch((error) => {
+        checkoutResult.then((result) => {
+          if (result?.error) {
+            clearTimeout(checkoutWatchdog);
+            showPaymentError(result.error);
+            return;
+          }
+          // A redirect result only means Cashfree submitted its form. Keep the
+          // watchdog running until this page actually unloads, so a blocked
+          // navigation becomes a visible retry error rather than a dead loader.
+          if (result?.redirect) return;
+          clearTimeout(checkoutWatchdog);
+        }).catch((error) => {
           clearTimeout(checkoutWatchdog);
           showPaymentError(error);
         });
