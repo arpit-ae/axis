@@ -270,13 +270,10 @@ async function handleCashfreeOrderStatus(orderId, env) {
 }
 
 async function cashfreeFetch(url, init) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000);
-  try {
-    return await fetch(url, { ...init, signal: controller.signal });
-  } finally {
-    clearTimeout(timeout);
-  }
+  return fetch(url, {
+    ...init,
+    signal: AbortSignal.timeout(15000)
+  });
 }
 
 async function handleCashfreeWebhook(request, env) {
