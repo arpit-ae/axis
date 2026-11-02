@@ -107,7 +107,7 @@
       });
       await cashfree.checkout({
         paymentSessionId: result.payment_session_id,
-        redirectTarget: '_self'
+        redirectTarget: '_modal'
       });
     } catch (error) {
       showPaymentError(error);
