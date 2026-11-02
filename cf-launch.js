@@ -88,8 +88,8 @@
       // If the SDK is prevented from navigating (for example by a browser
       // content blocker), never leave the customer on an indefinite loader.
       const checkoutWatchdog = setTimeout(() => {
-        if (location.pathname.endsWith('/pay-now')) {
-          showPaymentError(new Error('Cashfree checkout did not open. Disable content/privacy blockers for sdk.cashfree.com and payments.cashfree.com, reload this page, then try again. No payment was taken.'));
+        if (/\/pay-now(?:\.html)?\/?$/.test(location.pathname)) {
+          showPaymentError(new Error('Secure checkout could not open. Please reload this page and try again, or contact GOAXIS support if this continues. No payment was taken.'));
         }
       }, 15000);
 
