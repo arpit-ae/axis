@@ -184,7 +184,7 @@ async function handleCashfreeCreateOrder(request, env, url) {
   };
 
   try {
-    const response = await fetch(endpoint, {
+    const response = await cashfreeFetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -237,7 +237,7 @@ async function handleCashfreeOrderStatus(orderId, env) {
   const base = environment === "sandbox" ? "https://sandbox.cashfree.com/pg/orders/" : "https://api.cashfree.com/pg/orders/";
 
   try {
-    const response = await fetch(base + encodeURIComponent(orderId), {
+    const response = await cashfreeFetch(base + encodeURIComponent(orderId), {
       headers: {
         "x-api-version": "2025-01-01",
         "x-client-id": env.CASHFREE_APP_ID,
@@ -266,6 +266,16 @@ async function handleCashfreeOrderStatus(orderId, env) {
   } catch (error) {
     console.error("Cashfree order status request failed", error);
     return json({ ok: false, error: "Payment verification is temporarily unavailable." }, 502);
+  }
+}
+
+async function cashfreeFetch(url, init) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
