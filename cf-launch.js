@@ -83,12 +83,25 @@
       // The hosted checkout owns the same-tab navigation. Do not await it:
       // a redirect checkout does not resolve before the page leaves this site.
       button.textContent = 'Opening secure checkout…';
+      setMessage('Opening Cashfree secure checkout. Please wait…');
+
+      // If the SDK is prevented from navigating (for example by a browser
+      // content blocker), never leave the customer on an indefinite loader.
+      const checkoutWatchdog = setTimeout(() => {
+        if (location.pathname.endsWith('/pay-now')) {
+          showPaymentError(new Error('Cashfree checkout did not open. Disable content/privacy blockers for sdk.cashfree.com and payments.cashfree.com, reload this page, then try again. No payment was taken.'));
+        }
+      }, 15000);
+
       const checkoutResult = cashfree.checkout({
         paymentSessionId: result.payment_session_id,
         redirectTarget: '_self'
       });
-      if (checkoutResult && typeof checkoutResult.catch === 'function') {
-        checkoutResult.catch(showPaymentError);
+      if (checkoutResult && typeof checkoutResult.then === 'function') {
+        checkoutResult.then(() => clearTimeout(checkoutWatchdog)).catch((error) => {
+          clearTimeout(checkoutWatchdog);
+          showPaymentError(error);
+        });
       }
     } catch (error) {
       showPaymentError(error);
