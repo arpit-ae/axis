@@ -2,6 +2,13 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    // Cashfree approves goaxis.in as the checkout origin. Canonicalise public
+    // www page visits before the form can create an order from another origin.
+    if (url.hostname.toLowerCase() === "www.goaxis.in" && !url.pathname.startsWith("/api/")) {
+      url.hostname = "goaxis.in";
+      return Response.redirect(url.toString(), 308);
+    }
+
     if (url.pathname === "/api/enquiry") {
       if (request.method !== "POST") {
         return json({ ok: false, error: "Method not allowed." }, 405, { Allow: "POST" });
