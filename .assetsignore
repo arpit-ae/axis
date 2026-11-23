@@ -9,6 +9,8 @@ migrations/
 wrangler.toml
 README.md
 PAYMENT_SETUP.md
+EMAIL_SETUP.md
+tests/
 
 # Internal prototype pages are not part of the public site.
 admin.html
