@@ -10,6 +10,7 @@ Set these values:
 
 - **Secret** `CASHFREE_APP_ID`: the production App ID from Cashfree.
 - **Secret** `CASHFREE_SECRET_KEY`: the matching production Secret Key.
+- **Secret** `RESEND_API_KEY`: a domain-restricted Resend sending key, installed as a Worker secret (not in the repository).
 - **Variable** `CASHFREE_ENV`: `production`.
 - **Variable** `SITE_URL`: `https://goaxis.in`.
 
@@ -29,6 +30,8 @@ After changing a Worker variable/secret or source file, confirm the new Producti
 - `POST /api/cashfree/create-order`: validates form details and creates the Cashfree order.
 - `GET /api/cashfree/order/{order_id}`: retrieves the order from Cashfree for return-page verification.
 - `POST /api/cashfree/webhook`: verifies the Cashfree webhook signature.
+
+For published package IDs (`invoice-basic`, `invoice-purchase-sale`, `invoice-challan`, `website-ten-page`) the Worker sets fixed service prices server-side. Payment emails are dispatched only after the signed webhook is accepted AND Cashfree independently confirms order status `PAID`. Mail delivery is deduplicated in D1 `PaymentNotifications`; see `migrations/0002_payment_notifications.sql` and `EMAIL_SETUP.md`.
 
 The return page only displays payment success after a server-side order lookup confirms `PAID`. A browser redirect alone is not proof of payment. If an order is pending, customers should check its status before trying to pay again.
 
