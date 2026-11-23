@@ -2,8 +2,6 @@ name: Deploy GOAXIS to Cloudflare Workers
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
 permissions:
   contents: read
