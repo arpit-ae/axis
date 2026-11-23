@@ -1,6 +1,6 @@
 # GOAXIS CONSULTANCY
 
-Static business website and Cloudflare Worker API for GOAXIS CONSULTANCY. The production hostname is `https://goaxis.in`. The repo is designed for Cloudflare Workers static assets, with a D1 database for enquiries and Cashfree for hosted online checkout.
+Static business website and Cloudflare Worker API for GOAXIS CONSULTANCY. The production hostname is `https://goaxis.in`. The repo is designed for Cloudflare Workers static assets, with a D1 database for enquiries and Cashfree for hosted online checkout, and Resend for authenticated transactional email.
 
 ## Architecture
 
@@ -10,6 +10,9 @@ Static business website and Cloudflare Worker API for GOAXIS CONSULTANCY. The pr
 - `src/index.js`: Cloudflare Worker API and static asset fallback.
 - `forms.js`, `whatsapp.js`, `app.js`, `part2.js`: browser-side enquiry, navigation and service-page behavior.
 - `migrations/0001_phase1_enquiries.sql`: D1 `Leads` table.
+- `migrations/0002_payment_notifications.sql`: D1 paid-order notification deduplication.
+- `src/email.js`: payment-verified Resend confirmations and lead notifications.
+- `premium.css`, `documents.html`, `faq.html`: premium design and documented fixed-price packages.
 - `wrangler.toml`: Worker, static asset routing and D1 binding.
 - `.assetsignore`: prevents internal source/prototype/legacy files from being uploaded as public assets.
 
@@ -19,17 +22,18 @@ In **Cloudflare Dashboard → Workers & Pages → axis → Settings → Variable
 
 - Secret: `CASHFREE_APP_ID` (production App ID)
 - Secret: `CASHFREE_SECRET_KEY` (matching production Secret Key)
+- Secret: `RESEND_API_KEY` (restricted **sending_access** key for verified `goaxis.in` Resend domain)
 - Variable: `CASHFREE_ENV=production`
 - Variable: `SITE_URL=https://goaxis.in`
 
-The Worker also requires the D1 database binding named `DB`, targeting `goaxis-consultancy-db`. Confirm that migration `0001_phase1_enquiries.sql` has been applied in the intended database before relying on enquiry storage. Never commit or share secret values. See [PAYMENT_SETUP.md](PAYMENT_SETUP.md) for the production payment checklist.
+The Worker also requires the D1 database binding named `DB`, targeting `goaxis-consultancy-db`. Confirm that both D1 migrations have been applied in the intended database before relying on enquiry storage. Never commit secret values. See [EMAIL_SETUP.md](EMAIL_SETUP.md) for forwarding verification and email setup, and [PAYMENT_SETUP.md](PAYMENT_SETUP.md) for the production payment checklist.
 
 ## API routes
 
 - `POST /api/enquiry`: validates and stores a lead in D1.
 - `POST /api/cashfree/create-order`: validates details and creates a Cashfree order.
 - `GET /api/cashfree/order/{order_id}`: obtains order status directly from Cashfree.
-- `POST /api/cashfree/webhook`: verifies Cashfree webhook signatures.
+- `POST /api/cashfree/webhook`: verifies Cashfree webhook signatures, independently checks the order is paid and sends deduplicated payment emails.
 
 The Indian payment form accepts a 10-digit mobile number starting with 6–9; an optional `+91` prefix is normalized server-side. Payment success is displayed only after a server-side Cashfree lookup returns `PAID`. A return URL or browser message alone is not sufficient.
 
@@ -46,6 +50,8 @@ node --check part2.js
 node --check payment.js
 node --check whatsapp.js
 node --check src/index.js
+node --check src/email.js
+node --check cf-launch.js
 node --check admin.js
 ```
 
