@@ -1,6 +1,25 @@
 (() => {
   const form = document.getElementById('payment-form');
   if (!form) return;
+  const servicePackages = {
+    'invoice-basic': { amount: '500', title: 'Invoice Template' },
+    'invoice-purchase-sale': { amount: '800', title: 'Purchase + Sales Invoice Templates' },
+    'invoice-challan': { amount: '1000', title: 'Purchase + Sales Invoice + Delivery Challan Templates' },
+    'website-ten-page': { amount: '2000', title: '10-Page Business Website with First-Year Domain, Hosting and Basic Database' }
+  };
+  const requestedPackage = new URLSearchParams(location.search).get('package') || '';
+  const selectedPackage = Object.prototype.hasOwnProperty.call(servicePackages, requestedPackage)
+    ? servicePackages[requestedPackage] : null;
+  if (selectedPackage) {
+    const amountField = form.querySelector('[name="amount"]');
+    const purposeField = form.querySelector('[name="purpose"]');
+    amountField.value = selectedPackage.amount;
+    amountField.readOnly = true;
+    purposeField.value = selectedPackage.title;
+    purposeField.readOnly = true;
+    const heading = form.closest('.pay-card')?.querySelector('h1');
+    if (heading) heading.textContent = 'Checkout · ' + selectedPackage.title;
+  }
   const button = document.getElementById('pay-button');
   const message = document.getElementById('payment-message');
 
@@ -51,7 +70,8 @@
           phone,
           email: String(data.get('email')).trim(),
           amount: amount.toFixed(2),
-          purpose: String(data.get('purpose')).trim()
+          purpose: String(data.get('purpose')).trim(),
+          package_id: selectedPackage ? requestedPackage : ''
         })
       });
 
