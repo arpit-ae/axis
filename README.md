@@ -8,7 +8,7 @@ Static business website and Cloudflare Worker API for GOAXIS CONSULTANCY. The pr
 - `pay-now.html`, `payment.js`: payment form and Cashfree hosted checkout launch.
 - `payment-return.html`: server-verified payment result page.
 - `src/index.js`: Cloudflare Worker API and static asset fallback.
-- `forms.js`, `whatsapp.js`, `app.js`, `part2.js`: browser-side enquiry, navigation and service-page behavior.
+- `forms.js`, `experience.js`, `app.js`, `part2.js`: secure Send enquiry, liquid-glass motion, navigation and service-page behavior.
 - `migrations/0001_phase1_enquiries.sql`: D1 `Leads` table.
 - `migrations/0002_payment_notifications.sql`: D1 paid-order notification deduplication.
 - `src/email.js`: payment-verified Resend confirmations and lead notifications.
@@ -48,7 +48,7 @@ node --check app.js
 node --check forms.js
 node --check part2.js
 node --check payment.js
-node --check whatsapp.js
+node --check experience.js
 node --check src/index.js
 node --check src/email.js
 node --check cf-launch.js
@@ -63,3 +63,9 @@ CI also checks core file syntax and important route/asset wiring. Test the enqui
 - The legacy `netlify/functions/` code is not used by the Cloudflare Worker deployment and is excluded from public assets.
 - No card number, CVV, OTP or UPI PIN should be collected by GOAXIS forms.
 - Review service scope and policy text whenever pricing, data handling, delivery periods or third-party providers change.
+
+## November 2026 Business Starter Suite update
+- ₹2,000 includes the agreed starter 10-page website, purchase and sales invoice features, delivery challan tools, simple owner controls and two-sided email enquiries. The demo at `business-suite-demo.html` is browser-only; client systems are customized by scope.
+- Contact forms use Send and `POST /api/enquiry`, not a messaging-app button. Server-side Resend sends two separate emails using verified `contact@goaxis.in`: admin lead to `goaxis.in@gmail.com` and acknowledgment to customer, with a truthful `email_sent` field.
+- Security: honeypot, same-origin checks, D1 Leads per-recipient throttling, HTML escaping and idempotent Resend sends.
+- Cloudflare Workers Builds is linked to GitHub `main` and deploys automatically; optional `.github/workflows/deploy-production.yml` remains manual and requires its separate `CLOUDFLARE_API_TOKEN` repository secret if used. Do not assume the optional manual workflow is configured.
