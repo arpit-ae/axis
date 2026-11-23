@@ -1,0 +1,33 @@
+name: GOAXIS Live Contact Email Smoke Test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/smoke-enquiry-once.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contact-email:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify live homepage has email-first form
+        run: |
+          curl --fail --show-error --silent "https://goaxis.in/" | grep -q 'id="enquiry-form"'
+      - name: Submit one clearly labeled internal test (no payment)
+        run: |
+          cat > /tmp/goaxis-test-enquiry.json <<'JSON'
+          {"name":"GOAXIS Internal Delivery Test","email":"goaxis.in+contact-form-test@gmail.com","phone":"","service":"INTERNAL TEST - email confirmation","businessName":"GOAXIS TEST ONLY","businessType":"","message":"Labeled internal smoke test of the Send enquiry form. No customer order, no payment, no response required. Please ignore.","consent":true,"website":""}
+          JSON
+          curl --fail-with-body --show-error --silent \
+            --request POST "https://goaxis.in/api/enquiry" \
+            --header "Content-Type: application/json" \
+            --header "Accept: application/json" \
+            --header "Origin: https://goaxis.in" \
+            --data-binary @/tmp/goaxis-test-enquiry.json \
+            --output /tmp/goaxis-test-response.json
+          node -e 'const fs=require("node:fs");const d=JSON.parse(fs.readFileSync("/tmp/goaxis-test-response.json","utf8"));if(!d.ok||!d.email_sent||!d.reference){console.error("Email delivery not confirmed:",d);process.exit(1)}console.log("Contact email send accepted, reference:",d.reference)'
