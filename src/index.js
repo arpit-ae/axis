@@ -110,6 +110,19 @@ async function handleEnquiry(request, env, url) {
   if (!consent) return json({ ok: false, error: "Please agree to the enquiry privacy notice." }, 400);
   if (!env.DB) return json({ ok: false, error: "Enquiry storage is not configured yet. Please try again later." }, 503);
 
+  // Limit repeat sends from one email without storing visitors' IP addresses.
+  try {
+    const recent = await env.DB.prepare(
+      "SELECT COUNT(*) AS total FROM Leads WHERE email=? AND created_at > datetime('now','-1 hour')"
+    ).bind(email).first();
+    if (Number(recent?.total || 0) >= 3) {
+      return json({ ok: false, error: "Too many enquiries from this email address. Please email contact@goaxis.in directly." }, 429, { "Retry-After": "3600" });
+    }
+  } catch (error) {
+    console.error("GOAXIS enquiry rate check failed", String(error));
+    return json({ ok: false, error: "Enquiry service temporarily unavailable." }, 503);
+  }
+
   const reference = "ENQ-" + new Date().getUTCFullYear() + "-" + crypto.randomUUID().replace(/-/g, "").slice(0, 10).toUpperCase();
 
   try {
@@ -123,13 +136,20 @@ async function handleEnquiry(request, env, url) {
     return json({ ok: false, error: "We could not save your enquiry. Please try again later." }, 500);
   }
 
-  // Never fail a stored enquiry solely because the notification provider is unavailable.
+  // Only confirm "sent" after both Resend API requests succeeded.
+  let delivery = { adminSent: false, customerSent: false };
   try {
-    await notifyEnquiry(env, { reference, name, email, phone, service, businessName, businessType, message });
+    delivery = await notifyEnquiry(env, { reference, name, email, phone, service, businessName, businessType, message });
   } catch (error) {
-    console.error("GOAXIS enquiry email not delivered", { reference, error: String(error) });
+    console.error("GOAXIS enquiry notification failed", { reference, error: String(error) });
   }
-  return json({ ok: true, reference });
+  return json({
+    ok: true,
+    reference,
+    email_status: delivery.adminSent && delivery.customerSent ? "sent" : "pending",
+    owner_notified: delivery.adminSent,
+    customer_confirmed: delivery.customerSent
+  });
 }
 
 async function handleCashfreeCreateOrder(request, env, url) {
@@ -171,7 +191,7 @@ async function handleCashfreeCreateOrder(request, env, url) {
     "invoice-basic": { amount: 500, title: "Invoice Template" },
     "invoice-purchase-sale": { amount: 800, title: "Purchase + Sales Invoice Templates" },
     "invoice-challan": { amount: 1000, title: "Purchase + Sales Invoice + Delivery Challan Templates" },
-    "website-ten-page": { amount: 2000, title: "10-Page Business Website with First-Year Domain, Hosting and Basic Database" }
+    "website-ten-page": { amount: 2000, title: "Complete 10-Page Business Website + Purchase/Sales Invoices + Delivery Challan + Owner Control" }
   };
   const packageId = clean(data.package_id, 80);
   const selected = Object.prototype.hasOwnProperty.call(packages, packageId) ? packages[packageId] : null;

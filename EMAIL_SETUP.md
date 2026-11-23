@@ -30,3 +30,8 @@ Hosting/domain renewals, paid third-party services, tax requirements, custom int
 - GitHub merge alone does not deploy Worker assets. A separate Wrangler deployment did occur and was confirmed through Cloudflare Workers deployment metadata. Future deployments can use the manual GitHub Actions workflow with a scoped token.
 
 - A direct Resend email from sales@goaxis.in to the business Gmail inbox was delivered successfully. Full payment-triggered email remains unverified with an actual Cashfree sandbox payment; no real payment was charged for testing.
+
+## Contact form email workflow
+- Home and service enquiry forms use POST /api/enquiry; WhatsApp is not involved.
+- Each enquiry is stored in D1 Leads; the Worker sends from contact@goaxis.in to the contact@goaxis.in alias (Cloudflare forwarding to the verified business Gmail), then acknowledges the visitor from contact@goaxis.in. The response reports separately whether owner and customer email API submissions succeeded.
+- Provider acceptance is not proof of recipient inbox placement. Failures are reported to website visitors as pending while their D1 reference remains saved. Enquiries are limited per email to reduce autoresponder abuse; the honeypot remains enabled.

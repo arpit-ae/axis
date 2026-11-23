@@ -5,7 +5,7 @@
     'invoice-basic': { amount: '500', title: 'Invoice Template' },
     'invoice-purchase-sale': { amount: '800', title: 'Purchase + Sales Invoice Templates' },
     'invoice-challan': { amount: '1000', title: 'Purchase + Sales Invoice + Delivery Challan Templates' },
-    'website-ten-page': { amount: '2000', title: '10-Page Business Website with First-Year Domain, Hosting and Basic Database' }
+    'website-ten-page': { amount: '2000', title: 'Complete 10-Page Business Website + Purchase/Sales Invoices + Delivery Challan + Owner Control' }
   };
   const requestedPackage = new URLSearchParams(location.search).get('package') || '';
   const selectedPackage = Object.prototype.hasOwnProperty.call(servicePackages, requestedPackage)

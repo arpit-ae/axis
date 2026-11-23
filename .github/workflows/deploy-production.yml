@@ -24,7 +24,7 @@ jobs:
           node --check src/index.js
           node --check src/email.js
           node --check cf-launch.js
-          node --test tests/payment-emails.test.mjs
+          node --test tests/*.test.mjs
       - name: Check deployment authorization
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
