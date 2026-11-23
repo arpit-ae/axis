@@ -1,0 +1,52 @@
+/* GOAXIS premium glass design system. Non-essential effects respect reduced motion. */
+:root{--navy:#0b2442;--ink:#142942;--muted:#526782;--line:#dce7f3;--paper:#f5f9fe;--lav:#ebf0ff;--teal:#a2f2e4;--white:#fff;--radius:24px}
+body{background:radial-gradient(ellipse at 10% 6%,#e3f2ff 0,transparent 34%),radial-gradient(ellipse at 98% 25%,#eee7ff 0,transparent 27%),#f9fbff;color:var(--ink);-webkit-font-smoothing:antialiased}
+.site-header{background:rgba(250,253,255,.76);border-bottom:1px solid rgba(255,255,255,.65);backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);box-shadow:0 8px 40px rgba(22,54,91,.045)}
+.brand-mark{border-radius:15px;background:linear-gradient(135deg,#0b2442,#305b9b);box-shadow:0 9px 22px rgba(16,42,67,.18)}
+.announcement{background:linear-gradient(90deg,#091a30,#153d65,#0b2a49);letter-spacing:.11em}
+.announcement a{color:#b2ffeb}
+.hero{position:relative;overflow:hidden;background:radial-gradient(ellipse at 16% 18%,rgba(180,220,255,.55),transparent 49%),radial-gradient(ellipse at 89% 20%,rgba(210,196,255,.55),transparent 42%),linear-gradient(145deg,#f8fcff,#eef5ff)}
+.hero:before{content:"";position:absolute;inset:auto -8% -230px auto;width:520px;height:520px;background:radial-gradient(circle,rgba(94,151,255,.15),transparent 70%);pointer-events:none}
+h1,h2,h3{letter-spacing:-.035em}h1 span,h2 span{color:#4f65d6}
+.hero h1{color:#0a2545;text-wrap:balance}
+.eyebrow{color:#3d6693}
+.button,.nav-cta{background:linear-gradient(115deg,#0b2c50,#245c9c);box-shadow:0 12px 28px rgba(30,82,150,.16);transition:transform .2s ease,box-shadow .2s ease,opacity .2s ease}
+.button:hover,.nav-cta:hover{transform:translateY(-2px);box-shadow:0 17px 35px rgba(30,82,150,.22);opacity:1}
+.card,.dashboard,.form-box,.p2-form,.pay-card,.mock-site,.price-tile{background:rgba(255,255,255,.78)!important;backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);border:1px solid rgba(255,255,255,.88)!important;box-shadow:0 13px 45px rgba(38,73,128,.09),inset 0 1px 0 rgba(255,255,255,.9);border-radius:24px;transition:transform .25s ease,box-shadow .25s ease}
+.card:hover,.price-tile:hover{transform:translateY(-5px);box-shadow:0 22px 56px rgba(40,79,138,.15)}
+.card-dark{background:linear-gradient(140deg,#122d50,#24558c)!important;color:white}
+.card-dark p,.card-dark label{color:#e8f1fc}
+.dashboard{background:rgba(255,255,255,.72)!important;border:1px solid rgba(255,255,255,.95)}
+.float{background:rgba(255,255,255,.85);border:1px solid #fff;backdrop-filter:blur(16px);animation:goaxis-float 6s ease-in-out infinite}
+.about-art{background:linear-gradient(135deg,rgba(231,232,255,.95),rgba(209,239,255,.72));border:1px solid rgba(255,255,255,.9);box-shadow:0 20px 50px rgba(50,90,170,.10)}
+.contact,.p2-hero{background:linear-gradient(140deg,rgba(236,246,255,.88),rgba(242,238,255,.68))}
+input,select,textarea{transition:border-color .2s ease,box-shadow .2s ease}
+input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible,button:focus-visible{outline:3px solid #60a5fa;outline-offset:3px}
+footer{background:linear-gradient(120deg,#091b31,#102d4c)}
+.premium-shell{padding:80px 0}
+.premium-hero{padding:82px 0 58px;background:linear-gradient(120deg,rgba(213,235,255,.68),rgba(241,236,255,.82))}
+.premium-hero h1{max-width:920px;font-size:clamp(2.65rem,5vw,4.7rem);line-height:1.07;margin:0 0 22px}
+.premium-hero p{max-width:720px;font-size:1.08rem;color:var(--muted)}
+.price-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.price-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.price-tile{padding:30px;display:flex;flex-direction:column;gap:14px}
+.price-tile h2,.price-tile h3{margin:0;font-size:1.45rem}
+.price-tile p{margin:0;color:var(--muted)}
+.price-tile ul{padding-left:20px;line-height:1.9;margin:8px 0 18px;color:var(--ink)}
+.price-tile .button{margin-top:auto;align-self:flex-start}
+.package-price{font-weight:850;color:#123f78;font-size:clamp(2.25rem,4vw,3.3rem);letter-spacing:-.06em}
+.package-tag{display:inline-block;width:max-content;max-width:100%;font-size:.72rem;font-weight:800;color:#244c7b;background:#e3f0ff;border-radius:99px;padding:7px 13px;text-transform:uppercase;letter-spacing:.09em}
+.package-featured{background:linear-gradient(145deg,rgba(235,246,255,.94),rgba(246,240,255,.88))!important;border-color:#bfdcff!important}
+.package-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:24px}
+.premium-note{background:rgba(255,255,255,.7);border:1px solid #dbe7f3;border-radius:18px;padding:18px 23px;color:#405871;margin-top:30px;font-size:.91rem}
+.premium-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.premium-steps>div{border-left:3px solid #79a7e6;padding:10px 22px;background:rgba(255,255,255,.45);border-radius:0 12px 12px 0}
+.premium-steps strong{display:block;font-size:1.1rem;margin-bottom:6px}
+.faq-layout{max-width:860px;margin:auto}
+.faq-layout details{background:rgba(255,255,255,.8);border:1px solid #dce8f4;border-radius:17px;padding:19px 22px;margin:14px 0;box-shadow:0 7px 22px rgba(29,65,116,.05)}
+.faq-layout summary{cursor:pointer;font-weight:750}
+.faq-layout details p{color:var(--muted)}
+@keyframes goaxis-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@media(max-width:900px){.price-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.premium-steps{grid-template-columns:1fr}}
+@media(max-width:620px){.price-grid,.price-grid.two{grid-template-columns:1fr}.premium-shell{padding:50px 0}.premium-hero{padding:52px 0 34px}.price-tile{padding:23px}.site-header{backdrop-filter:blur(14px)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;scroll-behavior:auto!important;transition:none!important}}
