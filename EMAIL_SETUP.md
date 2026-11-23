@@ -4,10 +4,10 @@
 - Outbound sending domain goaxis.in: verified with Resend, with Cloudflare DNS DKIM, SPF and DMARC monitoring policy.
 - Server-side senders: sales@goaxis.in for order confirmations and enquiry@goaxis.in for enquiry alerts. Reply-to support@goaxis.in.
 - Incoming mail: Cloudflare Email Routing **enabled, ready and synced**. Five active forwarding rules for contact@, enquiry@, sales@, billing@ and support@ goaxis.in all forward to verified destination goaxis.in@gmail.com. These are forward-only aliases, not independent inboxes.
-- Cloudflare has provisioned three root MX records. A test message sent from another connected Gmail account to contact@goaxis.in arrived in the verified GOAXIS Gmail inbox; other aliases have API-confirmed active rules but their individual delivery was not tested.
+- Cloudflare has provisioned three root MX records. All five aliases were independently tested from another Gmail account and the messages were verified in the GOAXIS Gmail Inbox on 23 Nov 2026.
 
 ## Finish automated transactional email
-1. In Cloudflare Workers & Pages → axis → Settings → Variables and Secrets, add encrypted secret RESEND_API_KEY, using a goaxis.in scoped Resend sending_access key. Never add the key to HTML, JavaScript assets, repository files or plain text variables.
+1. Completed: RESEND_API_KEY is installed as a secret_text Worker binding on axis. Never add the key to HTML, public JavaScript, repository files, or plain-text configuration.
 2. Confirm both D1 migrations are applied in goaxis-consultancy-db.
 3. Deploy Worker source and site static assets from the same GitHub commit. The Cloudflare Worker handles signed Cashfree webhooks and independently checks PAID before sending customer and business notifications.
 4. In Cashfree dashboard, ensure notification URL https://goaxis.in/api/cashfree/webhook is registered for successful payments.
@@ -22,3 +22,9 @@
 - Existing 5-page starter package: ₹1,000 by separate quotation.
 
 Hosting/domain renewals, paid third-party services, tax requirements, custom integrations, and revisions beyond quoted scope require clear disclosure before taking an order.
+
+## Production code publishing
+- GitHub main contains tested website and Worker source, but Cloudflare's current live Worker retains the earlier code and static assets.
+- GitHub Actions workflow .github/workflows/deploy-production.yml provides a manual, CI-tested Wrangler deployment of script plus static assets, followed by page checks.
+- This requires adding a **GitHub Actions repository secret** named CLOUDFLARE_API_TOKEN with minimum necessary Cloudflare Workers Scripts edit permissions for the verified account. Do not place the token in Git commits or chat.
+- Cloudflare's connected API successfully creates Worker versions, but direct static assets upload returns HTTP 401 because the upload endpoint requires a separate upload-session token that the connector cannot pass. Do not assume a GitHub push deployed the site.
