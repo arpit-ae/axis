@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f4f2ff"><meta name="description" content="Explore a GOAXIS business suite demo for sales invoices, purchase invoices and delivery challans.">
+<link rel="canonical" href="https://goaxis.in/business-suite-demo.html"><title>Business Suite Demo · GOAXIS</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="premium.css">
+<script src="app.js" defer></script><script src="experience.js" defer></script></head>
+<body>
+<div class="announcement">A LITTLE PREVIEW OF WHAT'S POSSIBLE ✦ <a href="website-builder.html">Explore the ₹2,000 package ↗</a></div>
+<header class="site-header"><div class="container nav-wrap"><a class="brand" href="index.html"><span class="brand-mark">G<span>.</span></span><span class="brand-copy"><strong>GOAXIS</strong><small>CONSULTANCY</small></span></a><nav class="nav-links open"><a href="index.html">Home</a><a href="website-builder.html">Business Suite</a><a href="index.html#contact">Contact</a></nav></div></header>
+<main id="main"><section class="premium-hero no-print"><div class="container"><p class="eyebrow">INTERACTIVE BUSINESS SUITE PREVIEW</p><h1>Make paperwork<br><span>feel effortless.</span></h1><p>Choose a document, adjust its details and print or save as PDF using your browser. This is a local demonstration; no business data is uploaded.</p></div></section>
+<section class="section-pad demo-area"><div class="container demo-grid">
+<form class="demo-editor glass-panel no-print" id="document-editor">
+<h2>Customize a sample</h2><p class="form-small">Sample information only. For a customized system with owner access, choose the ₹2,000 starter suite.</p>
+<label for="doc-kind">Document type</label><select id="doc-kind"><option>Sales Invoice</option><option>Purchase Invoice</option><option>Delivery Challan</option></select>
+<div class="form-row"><label for="doc-business">Your business<input id="doc-business" value="Your Business Name" maxlength="100"></label><label for="doc-number">Document no.<input id="doc-number" value="INV-001" maxlength="40"></label></div>
+<div class="form-row"><label for="doc-customer">Customer / supplier<input id="doc-customer" value="Customer Name" maxlength="100"></label><label for="doc-date">Date<input id="doc-date" type="date"></label></div>
+<label for="doc-address">Business contact / address<input id="doc-address" value="Your city, India" maxlength="160"></label>
+<div class="form-row"><label for="item-name">Item / service<input id="item-name" value="Business service" maxlength="120"></label><label for="item-qty">Quantity<input id="item-qty" type="number" value="1" min="0.01" max="100000" step="0.01"></label></div>
+<div class="form-row"><label for="item-price">Unit price (₹)<input id="item-price" type="number" value="2000" min="0" max="100000000" step="0.01"></label><label for="doc-tax">Tax rate %<input id="doc-tax" type="number" value="0" min="0" max="100" step="0.01"></label></div>
+<label for="doc-notes">Notes<input id="doc-notes" value="Thank you for your business." maxlength="250"></label>
+<div class="hero-actions"><button type="button" class="button" id="print-document">Print / Save PDF ↗</button><button type="reset" class="button button-secondary">Reset sample</button></div>
+</form>
+<section class="demo-paper" id="document-preview" aria-label="Live document preview"><div class="demo-paper-brand"><div><span class="eyebrow">PREPARED WITH GOAXIS</span><h2 id="prev-business">Your Business Name</h2><p id="prev-address">Your city, India</p></div><div class="demo-document-type"><span id="prev-kind">SALES INVOICE</span><small id="prev-number">INV-001</small></div></div>
+<div class="invoice-rule"></div><div class="demo-paper-meta"><div><small id="prev-party-label">BILL TO</small><strong id="prev-customer">Customer Name</strong></div><div><small>DATE</small><strong id="prev-date"></strong></div></div>
+<table class="demo-table"><thead><tr><th>DESCRIPTION</th><th>QTY</th><th>RATE</th><th>AMOUNT</th></tr></thead><tbody><tr><td id="prev-item">Business service</td><td id="prev-qty">1</td><td id="prev-price">₹2,000.00</td><td id="prev-line">₹2,000.00</td></tr></tbody></table>
+<div class="demo-totals"><div><span>Subtotal</span><strong id="prev-subtotal">₹2,000.00</strong></div><div><span>Tax</span><strong id="prev-tax">₹0.00</strong></div><div class="grand-total"><span>Total</span><strong id="prev-total">₹2,000.00</strong></div></div>
+<p class="demo-paper-note" id="prev-notes">Thank you for your business.</p><div class="demo-paper-footer">Created with GOAXIS starter suite · Demonstration document</div></section>
+</div></section>
+<section class="p2-cta no-print"><div class="container"><div><h2>Want these tools for your business?</h2><p>The ₹2,000 bundle pairs this type of document workflow with your business website.</p></div><a class="button" href="website-builder.html">Explore the complete bundle ↗</a></div></section></main>
+<footer class="no-print"><div class="container footer-bottom"><span>© GOAXIS CONSULTANCY</span><span><a href="mailto:contact@goaxis.in">contact@goaxis.in</a></span></div></footer>
+<script>
+(() => {
+  const form=document.getElementById("document-editor");
+  const fields=["kind","business","number","customer","date","address","notes","tax"];
+  const get=id=>document.getElementById("doc-"+id);
+  const put=(id,value)=>{document.getElementById("prev-"+id).textContent=value};
+  const money=n=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR"}).format(n);
+  const today=new Date(); get("date").value=today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
+  function render(){
+    const kind=get("kind").value, qty=Math.max(0,Number(document.getElementById("item-qty").value)||0);
+    const price=Math.max(0,Number(document.getElementById("item-price").value)||0);
+    const tax=Math.min(100,Math.max(0,Number(get("tax").value)||0));
+    const subtotal=qty*price,total=subtotal+subtotal*tax/100;
+    put("kind",kind.toUpperCase());put("business",get("business").value||"Your Business");put("number",get("number").value);
+    put("customer",get("customer").value||"Customer");put("date",get("date").value);put("address",get("address").value);
+    put("party-label",kind==="Purchase Invoice"?"SUPPLIER":"BILL TO");
+    put("item",document.getElementById("item-name").value||"Item");put("qty",String(qty));
+    put("price",money(price));put("line",money(subtotal));put("subtotal",money(subtotal));
+    put("tax",money(subtotal*tax/100));put("total",money(total));put("notes",get("notes").value);
+  }
+  form.addEventListener("input",render);form.addEventListener("change",render);
+  form.addEventListener("reset",()=>setTimeout(()=>{get("date").value=today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");render()},0));
+  document.getElementById("print-document").addEventListener("click",()=>window.print());
+  render();
+})();
+</script>
+</body></html>

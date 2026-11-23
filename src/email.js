@@ -1,7 +1,7 @@
 // Server-side transactional mail for GOAXIS. Never expose RESEND_API_KEY in site assets.
 const ADMIN_EMAIL = "goaxis.in@gmail.com";
 const FROM_SALES = "GOAXIS Sales <sales@goaxis.in>";
-const FROM_ENQUIRIES = "GOAXIS Enquiries <enquiry@goaxis.in>";
+const FROM_ENQUIRIES = "GOAXIS Contact <contact@goaxis.in>";
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, char =>
@@ -33,7 +33,7 @@ async function sendMail(env, message, key) {
   return true;
 }
 export async function notifyEnquiry(env, lead) {
-  if (!env.RESEND_API_KEY) return false;
+  if (!env.RESEND_API_KEY) return { admin_sent: false, customer_sent: false };
   const rows = [
     ["Reference", lead.reference],
     ["Name", lead.name],
@@ -44,18 +44,58 @@ export async function notifyEnquiry(env, lead) {
     ["Business type", lead.businessType || "Not provided"],
     ["Message", lead.message]
   ];
-  await sendMail(env, {
+  const admin = {
     from: FROM_ENQUIRIES,
     to: [ADMIN_EMAIL],
     reply_to: lead.email,
-    subject: "New GOAXIS enquiry: " + lead.reference,
+    subject: "New GOAXIS enquiry • " + lead.reference,
     text: rows.map(([label, value]) => label + ": " + value).join("\n"),
-    html: "<h2>New customer enquiry</h2><table cellpadding='8'>" +
-      rows.map(([label, value]) => "<tr><th align='left'>" + escapeHtml(label) +
+    html: "<div style='font:16px/1.7 Arial,sans-serif;max-width:670px;margin:auto;color:#142942'><h1 style='color:#294e84'>GOAXIS • New enquiry</h1><p>Customer enquiry received through goaxis.in.</p><table cellpadding='9' style='border-collapse:collapse;width:100%;background:#f3f7ff'>" +
+      rows.map(([label, value]) => "<tr><th align='left' style='vertical-align:top'>" + escapeHtml(label) +
         "</th><td style='white-space:pre-wrap'>" + escapeHtml(value) + "</td></tr>").join("") +
-      "</table><p>Reply directly to the customer or manage this reference in your enquiry records.</p>"
-  }, "goaxis-enquiry-" + lead.reference);
-  return true;
+      "</table><p>Reply to this email to respond to the customer.</p></div>"
+  };
+
+  const customerText = [
+    "Thank you for contacting GOAXIS CONSULTANCY!",
+    "Hello " + lead.name + ",",
+    "We received your enquiry. Our team will review your requirements and reply by email.",
+    "Your reference: " + lead.reference,
+    "Service: " + lead.service,
+    "Email provided: " + lead.email,
+    "If you want to add details, reply to contact@goaxis.in and mention your reference.",
+    "We will never ask for your password, OTP or full bank-card details by email.",
+    "GOAXIS CONSULTANCY • https://goaxis.in"
+  ].join("\n\n");
+  const customer = {
+    from: FROM_ENQUIRIES,
+    to: [lead.email],
+    reply_to: "contact@goaxis.in",
+    subject: "We received your enquiry • " + lead.reference + " | GOAXIS",
+    text: customerText,
+    html: "<div style='font:16px/1.7 Arial,sans-serif;max-width:620px;margin:auto;padding:28px;border-radius:22px;background:#f7faff;color:#142942'>" +
+      "<p style='font-size:12px;letter-spacing:.16em;color:#4665a0'>GOAXIS CONSULTANCY</p>" +
+      "<h1 style='line-height:1.2;color:#183e73'>Thanks for reaching out! ✨</h1>" +
+      "<p>Hi " + escapeHtml(lead.name) + ", we've received your enquiry and will review it with care.</p>" +
+      "<div style='background:#fff;border:1px solid #e2eafa;border-radius:16px;padding:20px'>" +
+      "<p><strong>Your reference:</strong> " + escapeHtml(lead.reference) + "</p>" +
+      "<p><strong>Service:</strong> " + escapeHtml(lead.service) + "</p></div>" +
+      "<p>Have more questions? Simply reply to <a href='mailto:contact@goaxis.in'>contact@goaxis.in</a>.</p>" +
+      "<p style='font-size:13px;color:#526782'>For security, please don't share passwords, OTPs or complete card details.</p>" +
+      "<a href='https://goaxis.in' style='color:#245c9c'>Explore GOAXIS →</a></div>"
+  };
+
+  // Separate idempotency keys ensure retries cannot duplicate the other's email.
+  const results = await Promise.allSettled([
+    sendMail(env, admin, "goaxis-enquiry-admin-" + lead.reference),
+    sendMail(env, customer, "goaxis-enquiry-confirm-" + lead.reference)
+  ]);
+  if (results[0].status === "rejected") console.error("GOAXIS admin enquiry notification failed", { reference: lead.reference });
+  if (results[1].status === "rejected") console.error("GOAXIS customer enquiry confirmation failed", { reference: lead.reference });
+  return {
+    admin_sent: results[0].status === "fulfilled",
+    customer_sent: results[1].status === "fulfilled"
+  };
 }
 export async function notifyVerifiedPayment(env, orderId, paymentStatus) {
   if (paymentStatus !== "SUCCESS" || !/^GOAXIS_[A-Z0-9_]+$/.test(orderId)) {

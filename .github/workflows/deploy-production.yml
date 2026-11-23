@@ -2,6 +2,8 @@ name: Deploy GOAXIS to Cloudflare Workers
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -24,7 +26,7 @@ jobs:
           node --check src/index.js
           node --check src/email.js
           node --check cf-launch.js
-          node --test tests/payment-emails.test.mjs
+          node --test tests/payment-emails.test.mjs tests/contact-enquiry.test.mjs
       - name: Check deployment authorization
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -40,8 +42,10 @@ jobs:
         run: npx --yes wrangler@4 deploy --config wrangler.toml
       - name: Check deployed site pages (without charging)
         run: |
-          for route in / /documents.html /faq.html /services.html /website-builder.html /pay-now.html; do
+          for route in / /documents.html /faq.html /services.html /website-builder.html /business-suite-demo.html /pay-now.html; do
             curl --fail --show-error --silent --retry 3 --retry-delay 2 --output /dev/null "https://goaxis.in$route"
           done
           curl --fail --show-error --silent "https://goaxis.in/documents.html" | grep -q "Delivery Challan"
           curl --fail --show-error --silent "https://goaxis.in/website-builder.html" | grep -q "₹2,000"
+          curl --fail --show-error --silent "https://goaxis.in/" | grep -q "bundle-banner"
+          curl --fail --show-error --silent "https://goaxis.in/business-suite-demo.html" | grep -q "document-editor"

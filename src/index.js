@@ -110,6 +110,19 @@ async function handleEnquiry(request, env, url) {
   if (!consent) return json({ ok: false, error: "Please agree to the enquiry privacy notice." }, 400);
   if (!env.DB) return json({ ok: false, error: "Enquiry storage is not configured yet. Please try again later." }, 503);
 
+  // Stop repeated submissions to the same address from becoming a mail-bombing route.
+  try {
+    const previous = await env.DB.prepare(
+      "SELECT COUNT(*) AS count FROM Leads WHERE email=? AND created_at >= datetime('now','-15 minutes')"
+    ).bind(email).first();
+    if (Number(previous?.count || 0) >= 3) {
+      return json({ ok: false, error: "Too many recent enquiries for this email. Please try again in 15 minutes." }, 429);
+    }
+  } catch (error) {
+    console.error("GOAXIS enquiry abuse check unavailable", String(error));
+    return json({ ok: false, error: "Enquiry service is temporarily unavailable. Please try again." }, 503);
+  }
+
   const reference = "ENQ-" + new Date().getUTCFullYear() + "-" + crypto.randomUUID().replace(/-/g, "").slice(0, 10).toUpperCase();
 
   try {
@@ -123,13 +136,15 @@ async function handleEnquiry(request, env, url) {
     return json({ ok: false, error: "We could not save your enquiry. Please try again later." }, 500);
   }
 
-  // Never fail a stored enquiry solely because the notification provider is unavailable.
+  // A saved enquiry is never falsely represented as delivered when Resend is unavailable.
+  let emailSent = false;
   try {
-    await notifyEnquiry(env, { reference, name, email, phone, service, businessName, businessType, message });
+    const outcome = await notifyEnquiry(env, { reference, name, email, phone, service, businessName, businessType, message });
+    emailSent = outcome.admin_sent === true && outcome.customer_sent === true;
   } catch (error) {
-    console.error("GOAXIS enquiry email not delivered", { reference, error: String(error) });
+    console.error("GOAXIS enquiry email not confirmed", { reference, error: String(error) });
   }
-  return json({ ok: true, reference });
+  return json({ ok: true, reference, email_sent: emailSent });
 }
 
 async function handleCashfreeCreateOrder(request, env, url) {
@@ -171,7 +186,7 @@ async function handleCashfreeCreateOrder(request, env, url) {
     "invoice-basic": { amount: 500, title: "Invoice Template" },
     "invoice-purchase-sale": { amount: 800, title: "Purchase + Sales Invoice Templates" },
     "invoice-challan": { amount: 1000, title: "Purchase + Sales Invoice + Delivery Challan Templates" },
-    "website-ten-page": { amount: 2000, title: "10-Page Business Website with First-Year Domain, Hosting and Basic Database" }
+    "website-ten-page": { amount: 2000, title: "Business Website + Sales/Purchase Invoice + Delivery Challan + Admin Controls (Starter Suite)" }
   };
   const packageId = clean(data.package_id, 80);
   const selected = Object.prototype.hasOwnProperty.call(packages, packageId) ? packages[packageId] : null;
