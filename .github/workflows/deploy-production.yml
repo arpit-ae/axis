@@ -1,0 +1,47 @@
+name: Deploy GOAXIS to Cloudflare Workers
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: goaxis-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax and payment-email tests
+        run: |
+          node --check src/index.js
+          node --check src/email.js
+          node --check cf-launch.js
+          node --test tests/payment-emails.test.mjs
+      - name: Check deployment authorization
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::GitHub Actions secret CLOUDFLARE_API_TOKEN is missing. Add a restricted token with Workers Scripts Edit and rerun."
+            exit 1
+          fi
+      - name: Deploy matched Worker and static assets
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: "348a6c87a3d63e65b44653d08839efa4"
+        run: npx --yes wrangler@4 deploy --config wrangler.toml
+      - name: Check deployed site pages (without charging)
+        run: |
+          for route in / /documents.html /faq.html /services.html /website-builder.html /pay-now.html; do
+            curl --fail --show-error --silent --retry 3 --retry-delay 2 --output /dev/null "https://goaxis.in$route"
+          done
+          curl --fail --show-error --silent "https://goaxis.in/documents.html" | grep -q "Delivery Challan"
+          curl --fail --show-error --silent "https://goaxis.in/website-builder.html" | grep -q "₹2,000"
