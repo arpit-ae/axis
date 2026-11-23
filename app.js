@@ -1,4 +1,4 @@
-/* Shared accessible navigation; no WhatsApp floating buttons. */
+/* Shared accessible navigation; no messaging-app floating buttons. */
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".menu-toggle").forEach(button => {
     const nav = document.getElementById(button.getAttribute("aria-controls"));
