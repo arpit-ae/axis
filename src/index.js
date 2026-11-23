@@ -1,3 +1,5 @@
+import { notifyEnquiry, notifyVerifiedPayment } from "./email.js";
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -119,6 +121,12 @@ async function handleEnquiry(request, env, url) {
     return json({ ok: false, error: "We could not save your enquiry. Please try again later." }, 500);
   }
 
+  // Never fail a stored enquiry solely because the notification provider is unavailable.
+  try {
+    await notifyEnquiry(env, { reference, name, email, phone, service, businessName, businessType, message });
+  } catch (error) {
+    console.error("GOAXIS enquiry email not delivered", { reference, error: String(error) });
+  }
   return json({ ok: true, reference });
 }
 
@@ -303,11 +311,10 @@ async function handleCashfreeWebhook(request, env) {
 
   const orderId = clean(event?.data?.order?.order_id, 100);
   const paymentStatus = clean(event?.data?.payment?.payment_status, 50);
-  console.log("Verified Cashfree webhook", { orderId, paymentStatus, eventType: event?.type || "unknown" });
-
-  // Cashfree remains the source of truth. The return page also performs a fresh
-  // server-side order lookup before displaying a successful payment.
-  return json({ ok: true });
+  // Only signed SUCCESS events qualify. The mail helper rechecks PAID directly with
+  // Cashfree before issuing customer and admin messages, with D1 deduplication.
+  const result = await notifyVerifiedPayment(env, orderId, paymentStatus);
+  return json(result.body, result.code);
 }
 
 async function hmacBase64(secret, message) {
