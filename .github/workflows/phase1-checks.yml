@@ -54,6 +54,6 @@ jobs:
           grep -q 'contact@goaxis.in' src/email.js
           grep -q 'email_sent' src/index.js
           grep -q 'Send' forms.js
-          if grep -Eil 'whatsapp|wa\\.me|api\\.whatsapp\\.com' *.html app.js part2.js forms.js experience.js; then
+          if grep -Eil 'whatsapp|wa\\.me|api\\.whatsapp\\.com' index.html services.html documents.html website-builder.html service.html faq.html pay-now.html payment-return.html privacy.html terms.html refunds-cancellations.html 404.html business-suite-demo.html app.js part2.js forms.js experience.js; then
             echo "Old WhatsApp contact references found in public website assets"; exit 1;
           fi
