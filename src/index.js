@@ -165,8 +165,18 @@ async function handleCashfreeCreateOrder(request, env, url) {
   let phone = suppliedPhone.replace(/\D/g, "");
   // Accept either a 10-digit Indian mobile or the same number prefixed by country code 91.
   if (phone.length === 12 && phone.startsWith("91")) phone = phone.slice(2);
-  const purpose = clean(data.purpose, 200);
-  const amount = Number(data.amount);
+  const packages = {
+    "invoice-basic": { amount: 500, title: "Invoice Template" },
+    "invoice-purchase-sale": { amount: 800, title: "Purchase + Sales Invoice Templates" },
+    "invoice-challan": { amount: 1000, title: "Purchase + Sales Invoice + Delivery Challan Templates" },
+    "website-ten-page": { amount: 2000, title: "10-Page Business Website with First-Year Domain, Hosting and Basic Database" }
+  };
+  const packageId = clean(data.package_id, 80);
+  const selected = Object.prototype.hasOwnProperty.call(packages, packageId) ? packages[packageId] : null;
+  if (packageId && !selected) return json({ ok: false, error: "This service package is not available." }, 400);
+  // Fixed-price package values are determined server-side, never trusted from browser fields.
+  const purpose = selected ? selected.title : clean(data.purpose, 200);
+  const amount = selected ? selected.amount : Number(data.amount);
 
   if (name.length < 2) return json({ ok: false, error: "Please enter your full name." }, 400);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return json({ ok: false, error: "Please enter a valid email address." }, 400);
