@@ -1,4 +1,4 @@
-// GOAXIS secure email-first enquiry flow. No WhatsApp dependency.
+// GOAXIS secure email-first enquiry flow. No messaging-app dependency.
 document.addEventListener("DOMContentLoaded", () => {
   const forms = ["enquiry-form", "service-enquiry-form"]
     .map(id => document.getElementById(id)).filter(Boolean);
