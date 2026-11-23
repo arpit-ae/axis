@@ -1,16 +1,10 @@
 # GOAXIS transactional email and inbound aliases
 
 ## Current scope
-- Outbound sending domain: goaxis.in, verified with Resend. DKIM, SPF (send.goaxis.in) and rsend CNAME configured in Cloudflare DNS.
-- DMARC: _dmarc.goaxis.in starts with p=none for monitoring; review alignment/delivery before enforcing.
-- Mail sender addresses: sales@goaxis.in for payment confirmations, enquiry@goaxis.in for enquiry notifications; support@goaxis.in is the reply-to.
-- Receiving: Cloudflare Email Routing aliases contact@, enquiry@, sales@, billing@ and support@ exist as **disabled rules**, forwarding to goaxis.in@gmail.com only after that Gmail destination is verified. They are not inboxes and are not live until Cloudflare Email Routing itself and each rule are enabled.
-
-## Finish inbound setup (user verification required)
-1. In goaxis.in@gmail.com, open Cloudflare's verification email and approve this forwarding destination.
-2. In Cloudflare → goaxis.in → Email → Email Routing, enable Email Routing; confirm Cloudflare provisions the root-domain MX/TXT records and there is no incompatible mail host.
-3. Activate the five existing forwarding rules individually; verify from an external sender to contact@goaxis.in and support@goaxis.in.
-4. Never claim routing is live while verification is pending. Outbound sending and inbound forwarding are independent.
+- Outbound sending domain goaxis.in: verified with Resend, with Cloudflare DNS DKIM, SPF and DMARC monitoring policy.
+- Server-side senders: sales@goaxis.in for order confirmations and enquiry@goaxis.in for enquiry alerts. Reply-to support@goaxis.in.
+- Incoming mail: Cloudflare Email Routing **enabled, ready and synced**. Five active forwarding rules for contact@, enquiry@, sales@, billing@ and support@ goaxis.in all forward to verified destination goaxis.in@gmail.com. These are forward-only aliases, not independent inboxes.
+- Cloudflare has provisioned three root MX records. Test actual mail arrival from an outside sender before relying on routing for urgent orders.
 
 ## Finish automated transactional email
 1. In Cloudflare Workers & Pages → axis → Settings → Variables and Secrets, add encrypted secret RESEND_API_KEY, using a goaxis.in scoped Resend sending_access key. Never add the key to HTML, JavaScript assets, repository files or plain text variables.
