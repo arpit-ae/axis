@@ -44,6 +44,8 @@ export default {
     if (
       url.pathname === "/README.md" ||
       url.pathname === "/PAYMENT_SETUP.md" ||
+      url.pathname === "/EMAIL_SETUP.md" ||
+      url.pathname.startsWith("/tests/") ||
       url.pathname === "/wrangler.toml" ||
       url.pathname.startsWith("/src/") ||
       url.pathname.startsWith("/migrations/") ||
