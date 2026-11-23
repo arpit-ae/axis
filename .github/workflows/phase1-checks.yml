@@ -18,13 +18,13 @@ jobs:
           node --check forms.js
           node --check part2.js
           node --check payment.js
-          node --check whatsapp.js
+          node --check experience.js
           node --check admin.js
           node --check src/index.js
           node --check src/email.js
           node --check cf-launch.js
       - name: Verify payment email logic with mocked Cashfree and Resend
-        run: node --test tests/payment-emails.test.mjs
+        run: node --test tests/payment-emails.test.mjs tests/contact-enquiry.test.mjs
       - name: Check Phase 1 wiring
         run: |
           grep -q 'src="forms.js" defer' index.html
@@ -46,3 +46,14 @@ jobs:
           grep -q 'website-ten-page' website-builder.html
           grep -q 'premium.css' index.html
           grep -q 'faq.html' sitemap.xml
+
+      - name: Check complete suite and no WhatsApp in public pages
+        run: |
+          grep -q 'sales &amp; purchase invoice' website-builder.html || grep -q 'purchase &amp; sales invoices' website-builder.html
+          grep -q 'business-suite-demo.html' index.html
+          grep -q 'contact@goaxis.in' src/email.js
+          grep -q 'email_sent' src/index.js
+          grep -q 'Send' forms.js
+          if grep -Eil 'whatsapp|wa\\.me|api\\.whatsapp\\.com' *.html app.js part2.js forms.js experience.js; then
+            echo "Old WhatsApp contact references found in public website assets"; exit 1;
+          fi
