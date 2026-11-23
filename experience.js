@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
       observer.observe(item);
     });
   }
-  // A single unobtrusive CTA replaces the old WhatsApp widget.
+  // A single unobtrusive CTA replaces the old messaging-app widget.
   if (!document.querySelector(".send-float") && !document.querySelector("#payment-form")) {
     const a = document.createElement("a");
     a.className = "send-float";
