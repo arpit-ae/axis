@@ -4,7 +4,7 @@
 - Outbound sending domain goaxis.in: verified with Resend, with Cloudflare DNS DKIM, SPF and DMARC monitoring policy.
 - Server-side senders: sales@goaxis.in for order confirmations and enquiry@goaxis.in for enquiry alerts. Reply-to support@goaxis.in.
 - Incoming mail: Cloudflare Email Routing **enabled, ready and synced**. Five active forwarding rules for contact@, enquiry@, sales@, billing@ and support@ goaxis.in all forward to verified destination goaxis.in@gmail.com. These are forward-only aliases, not independent inboxes.
-- Cloudflare has provisioned three root MX records. Test actual mail arrival from an outside sender before relying on routing for urgent orders.
+- Cloudflare has provisioned three root MX records. A test message sent from another connected Gmail account to contact@goaxis.in arrived in the verified GOAXIS Gmail inbox; other aliases have API-confirmed active rules but their individual delivery was not tested.
 
 ## Finish automated transactional email
 1. In Cloudflare Workers & Pages → axis → Settings → Variables and Secrets, add encrypted secret RESEND_API_KEY, using a goaxis.in scoped Resend sending_access key. Never add the key to HTML, JavaScript assets, repository files or plain text variables.
