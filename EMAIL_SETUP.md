@@ -24,7 +24,9 @@
 Hosting/domain renewals, paid third-party services, tax requirements, custom integrations, and revisions beyond quoted scope require clear disclosure before taking an order.
 
 ## Production code publishing
-- GitHub main contains tested website and Worker source, but Cloudflare's current live Worker retains the earlier code and static assets.
+- On 23 Nov 2026 Cloudflare recorded an updated Wrangler production deployment of axis (version 4c7ad6a6-1c6b-477c-bbe7-2f38d53c8716). Its live Worker source was confirmed to include verified-payment Resend notifications and fixed-price package code. Browser Rendering verified that the homepage includes new pricing and that documents.html displays the invoice packages.
 - GitHub Actions workflow .github/workflows/deploy-production.yml provides a manual, CI-tested Wrangler deployment of script plus static assets, followed by page checks.
 - This requires adding a **GitHub Actions repository secret** named CLOUDFLARE_API_TOKEN with minimum necessary Cloudflare Workers Scripts edit permissions for the verified account. Do not place the token in Git commits or chat.
-- Cloudflare's connected API successfully creates Worker versions, but direct static assets upload returns HTTP 401 because the upload endpoint requires a separate upload-session token that the connector cannot pass. Do not assume a GitHub push deployed the site.
+- GitHub merge alone does not deploy Worker assets. A separate Wrangler deployment did occur and was confirmed through Cloudflare Workers deployment metadata. Future deployments can use the manual GitHub Actions workflow with a scoped token.
+
+- A direct Resend email from sales@goaxis.in to the business Gmail inbox was delivered successfully. Full payment-triggered email remains unverified with an actual Cashfree sandbox payment; no real payment was charged for testing.
