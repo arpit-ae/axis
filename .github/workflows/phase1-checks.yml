@@ -25,6 +25,8 @@ jobs:
           node --check cf-launch.js
       - name: Verify payment email logic with mocked Cashfree and Resend
         run: node --test tests/payment-emails.test.mjs tests/contact-enquiry.test.mjs
+      - name: Guard Pay Now in site header and Cashfree checkout
+        run: node --test tests/pay-now-navigation.test.mjs
       - name: Check Phase 1 wiring
         run: |
           grep -q 'src="forms.js" defer' index.html
