@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS OrbitChallenges (
+  id TEXT PRIMARY KEY, digest TEXT NOT NULL, created INTEGER NOT NULL,
+  attempts INTEGER NOT NULL DEFAULT 0, claim TEXT
+);
+CREATE TABLE IF NOT EXISTS OrbitSessions (
+  digest TEXT PRIMARY KEY, expires INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS OrbitDocuments (
+  id TEXT PRIMARY KEY, mode TEXT NOT NULL, year INTEGER NOT NULL,
+  number TEXT NOT NULL COLLATE NOCASE, buyer TEXT NOT NULL, date TEXT NOT NULL,
+  revision INTEGER NOT NULL, updated INTEGER NOT NULL, body TEXT NOT NULL,
+  UNIQUE(mode, year, number)
+);
+CREATE INDEX IF NOT EXISTS orbit_recent ON OrbitDocuments(updated DESC, id);

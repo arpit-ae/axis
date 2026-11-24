@@ -210,3 +210,12 @@ export async function notifyVerifiedPayment(env, orderId, paymentStatus) {
       .bind(orderId).run().catch(() => {});
   }
 }
+
+export async function sendOrbitCode(env, code, challenge) {
+  return sendMail(env, {
+    from: FROM_ENQUIRIES,
+    to: ["orbitgloble@gmail.com"],
+    subject: "Orbit Global billing sign-in code",
+    text: `Enter ${code} on the Orbit Global billing page to sign in. This code expires in 10 minutes. If you did not request it, you can ignore this email.`
+  }, "orbit-signin-" + challenge);
+}

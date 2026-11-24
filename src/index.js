@@ -1,5 +1,7 @@
 import { notifyEnquiry, notifyVerifiedPayment } from "./email.js";
 
+import { orbitBilling } from "./orbit-billing.js";
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -10,6 +12,8 @@ export default {
       url.hostname = "goaxis.in";
       return Response.redirect(url.toString(), 308);
     }
+
+    if (url.pathname.startsWith("/api/orbit/")) return orbitBilling(request, env, url);
 
     if (url.pathname === "/api/enquiry") {
       if (request.method !== "POST") {
