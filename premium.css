@@ -155,3 +155,37 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{border-color:#91
 @media(max-width:620px){.love-hero h1{font-size:clamp(2.6rem,9vw,3.8rem)}.hero-lead{font-size:1rem}.suite-feature-grid{grid-template-columns:1fr}.suite-feature{min-height:0}.suite-visual{min-height:370px}.suite-window-body{padding:28px 19px}.suite-tag{padding:9px 12px;font-size:.7rem}.suite-tag.one{top:5%}.suite-tag.two{bottom:2%}.bundle-banner{padding:35px 0}.bundle-banner-inner{display:block}.bundle-price-sticker{display:none}.demo-paper{padding:22px;min-height:550px}.demo-paper-brand h2{font-size:1.2rem}.demo-document-type span{font-size:1rem}.demo-editor .form-row{grid-template-columns:1fr}.send-float{right:15px;bottom:15px;padding:12px 17px}.is-reveal{transition-duration:.5s}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.is-reveal{opacity:1;transform:none}.suite-window,.suite-orb,.suite-tag,.pulse-dot,.about-art:after,.hero:before{animation:none!important}.button:before,.nav-cta:before{display:none}}
 @media print{@page{size:A4;margin:14mm}body{background:white!important;color:#111!important}.no-print,.site-header,.announcement,.send-float,footer,.p2-cta{display:none!important}.demo-area{padding:0!important}.demo-grid{display:block!important}.demo-paper{width:100%!important;padding:10px!important;border-radius:0;box-shadow:none!important;border:0!important;min-height:0!important;break-inside:avoid}.demo-document-type span{color:#111!important}.demo-paper-footer{color:#555}.demo-paper .eyebrow{color:#555}.is-reveal{opacity:1!important;transform:none!important}}
+
+
+/* Pay Now stays visible on every public page, independently of mobile navigation. */
+.site-header .nav-wrap{gap:clamp(9px,1.1vw,18px)}
+.site-header .nav-links{gap:clamp(8px,1.1vw,17px)}
+.header-pay-now{position:relative;isolation:isolate;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:43px;padding:10px 18px;border:1px solid rgba(255,255,255,.75);border-radius:100px;background:linear-gradient(115deg,rgba(104,82,195,.98),rgba(167,100,187,.97) 70%,rgba(219,127,174,.95));color:#fff!important;font-weight:850;font-size:.9rem;letter-spacing:.01em;white-space:nowrap;text-decoration:none;box-shadow:0 9px 25px rgba(105,73,161,.25),inset 0 1px rgba(255,255,255,.35);transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s ease,background .28s ease}
+.header-pay-now:hover{transform:translateY(-2px);box-shadow:0 15px 32px rgba(105,73,161,.35);opacity:1}
+.header-pay-now:focus-visible{outline:3px solid #7668d9;outline-offset:3px}
+.header-pay-now span:first-child{color:#ffe9bd}
+.hero-pay-now{border:1px solid rgba(111,93,179,.32)!important}
+@media(max-width:1040px){
+  .site-header .nav-wrap>.menu-toggle{display:block;order:1;color:#342861;background:rgba(244,239,255,.85);border:1px solid rgba(133,106,199,.22);padding:7px 12px;border-radius:12px;cursor:pointer}
+  .site-header .nav-wrap>.header-pay-now{order:2}
+  .site-header .nav-wrap>.nav-links{display:none;position:absolute;top:100%;left:0;right:0;z-index:5;max-height:calc(100dvh - 72px);overflow-y:auto;flex-direction:column;align-items:stretch;gap:4px;padding:18px max(22px,calc((100vw - 1000px)/2));border-bottom:1px solid rgba(177,164,214,.32);background:rgba(252,249,255,.97);backdrop-filter:blur(25px) saturate(170%);box-shadow:0 18px 33px rgba(48,39,114,.13)}
+  .site-header .nav-wrap>.nav-links.open{display:flex}
+  .site-header .nav-wrap>.nav-links a{padding:10px 13px}
+  .site-header .nav-wrap>.nav-links .nav-cta{color:white}
+}
+@media(max-width:600px){
+  .site-header .nav-wrap{gap:9px;min-height:68px}
+  .site-header .nav-wrap .brand-mark{width:34px;height:34px;font-size:1.15rem}
+  .site-header .brand-copy strong{font-size:.85rem}
+  .site-header .brand-copy small{font-size:.51rem}
+  .site-header .nav-wrap>.menu-toggle{margin-left:auto;padding:6px 10px}
+  .site-header .nav-wrap>.header-pay-now{font-size:.79rem;padding:9px 11px;min-height:39px;gap:5px}
+  .site-header .nav-wrap>.nav-cta{display:none}
+}
+@media(max-width:390px){
+  .site-header .nav-wrap .brand{gap:6px}
+  .site-header .brand-copy strong{font-size:.78rem}
+  .site-header .brand-copy small{letter-spacing:.1em}
+  .site-header .nav-wrap>.header-pay-now{padding:8px 9px;font-size:.75rem}
+}
+@media(prefers-reduced-motion:reduce){.header-pay-now{transition:none}}
