@@ -250,3 +250,18 @@
   .paper .preview-table td:nth-child(2){grid-column:1/-1;font-size:16px;font-weight:700;margin-bottom:4px}
   .paper .preview-table td[data-label]::before{content:attr(data-label);display:block;font-weight:600;color:var(--muted)}
 }
+
+@media screen {
+  .access-screen {
+    display: grid;
+    min-height: 100vh;
+    min-height: 100svh;
+    place-items: center;
+    padding: 20px;
+  }
+  .access-card { width: min(100%, 400px); padding: clamp(22px, 5vw, 34px); }
+  .access-card .monogram { background: #152c46; border-color: #152c46; }
+  .access-card h1 { margin: 24px 0 16px; font-size: 26px; line-height: 1.2; }
+  .access-card button { width: 100%; margin-top: 16px; }
+  #access-error { margin: 8px 0 0; color: #9b2825; font-size: 14px; }
+}

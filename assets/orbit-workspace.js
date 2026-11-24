@@ -1,6 +1,43 @@
 'use strict';
 
 const cloudDialog = $('cloud-dialog');
+const accessScreen = $('access-screen');
+const accessForm = $('access-form');
+const accessPassword = $('access-password');
+const accessError = $('access-error');
+const billingContent = $('billing-content');
+
+function resetAccessForm() {
+  accessPassword.value = '';
+  accessPassword.removeAttribute('aria-invalid');
+  accessError.hidden = true;
+}
+
+accessForm.addEventListener('submit', event => {
+  event.preventDefault();
+  if (accessPassword.value !== accessForm.dataset.password) {
+    accessPassword.setAttribute('aria-invalid', 'true');
+    accessError.hidden = false;
+    accessPassword.focus();
+    accessPassword.select();
+    return;
+  }
+  resetAccessForm();
+  accessScreen.hidden = true;
+  billingContent.hidden = false;
+  billingContent.inert = false;
+  $('studio-heading').focus();
+});
+
+// Restore the entry screen if the browser keeps this page in its back/forward cache.
+window.addEventListener('pagehide', () => {
+  if (cloudDialog.open) cloudDialog.close();
+  billingContent.inert = true;
+  billingContent.hidden = true;
+  accessScreen.hidden = false;
+  resetAccessForm();
+});
+
 let cloudIntent = 'list';
 let challenge = '';
 let listOffset = 0;

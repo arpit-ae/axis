@@ -11,13 +11,27 @@
   <script src="/assets/orbit-workspace.js" defer></script>
 </head>
 <body>
+<main class="access-screen" id="access-screen">
+  <section class="card access-card" aria-labelledby="access-heading">
+    <div class="brand"><span class="monogram" aria-hidden="true">OG</span><strong>Orbit Global</strong></div>
+    <h1 id="access-heading">Open invoice studio</h1>
+    <form id="access-form" data-password="9334730480">
+      <label for="access-password">Page password</label>
+      <input id="access-password" type="password" inputmode="numeric" autocomplete="off" aria-describedby="access-error" required>
+      <p id="access-error" role="alert" hidden>Incorrect password. Try again.</p>
+      <button class="primary" type="submit">Open billing</button>
+    </form>
+    <noscript>Enable JavaScript to open the billing page.</noscript>
+  </section>
+</main>
+<div id="billing-content" hidden inert>
 <header class="mast">
   <div class="mast-inner"><div class="brand"><span class="monogram" aria-hidden="true">OG</span><strong>Orbit Global</strong></div>
     <button id="saved-bills" class="mast-action">Saved bills</button></div>
 </header>
 <main class="wrap">
   <div class="workspace-head no-print">
-    <div><h1>Invoice studio</h1><div class="draft-line"><strong id="document-ref"></strong><span class="status" id="status" role="status">Loading editor…</span></div></div>
+    <div><h1 id="studio-heading" tabindex="-1">Invoice studio</h1><div class="draft-line"><strong id="document-ref"></strong><span class="status" id="status" role="status">Loading editor…</span></div></div>
     <div class="amount"><span id="amount-label">Grand total</span><strong id="running-amount">₹0.00</strong></div>
   </div>
   <div class="toolbar no-print">
@@ -60,4 +74,5 @@
   <div id="history-panel" hidden><div class="history-tools"><button id="refresh-history">Refresh</button><button id="logout">Sign out</button></div><div id="bill-list"></div><button id="more-bills" hidden>Load more</button></div>
   <p id="cloud-message" role="status"></p>
 </dialog>
+</div>
 </body></html>
