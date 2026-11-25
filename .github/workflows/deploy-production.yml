@@ -9,6 +9,10 @@ on:
       - '**/*.css'
       - 'src/**'
       - 'cf-launch.js'
+      - 'catalog.js'
+      - 'receipt-ui.js'
+      - 'payment-return.js'
+      - 'migrations/**'
       - 'experience.js'
       - 'forms.js'
       - 'wrangler.toml'
@@ -35,7 +39,7 @@ jobs:
           node --check src/index.js
           node --check src/email.js
           node --check cf-launch.js
-          node --test tests/payment-emails.test.mjs tests/contact-enquiry.test.mjs tests/pay-now-navigation.test.mjs
+          node --test tests/*.test.mjs
       - name: Check deployment authorization
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -54,7 +58,11 @@ jobs:
           for route in / /documents.html /faq.html /services.html /website-builder.html /business-suite-demo.html /pay-now.html; do
             curl --fail --show-error --silent --retry 3 --retry-delay 2 --output /dev/null "https://goaxis.in$route"
           done
-          curl --fail --show-error --silent "https://goaxis.in/documents.html" | grep -q "Delivery Challan"
-          curl --fail --show-error --silent "https://goaxis.in/website-builder.html" | grep -q "₹2,000"
-          curl --fail --show-error --silent "https://goaxis.in/" | grep -q "bundle-banner"\n          curl --fail --show-error --silent "https://goaxis.in/" | grep -q "header-pay-now"\n          curl --fail --show-error --silent "https://goaxis.in/pay-now.html" | grep -q "id=\\"pay-button\\""
-          curl --fail --show-error --silent "https://goaxis.in/business-suite-demo.html" | grep -q "document-editor"
+          curl --fail --show-error --silent --location "https://goaxis.in/documents.html" | grep -q "Delivery Challan"
+          curl --fail --show-error --silent --location "https://goaxis.in/website-builder.html" | grep -q "₹2,000"
+          curl --fail --show-error --silent --location "https://goaxis.in/" --output /tmp/goaxis-home.html
+          grep -q 'bundle-banner' /tmp/goaxis-home.html
+          grep -q 'header-pay-now' /tmp/goaxis-home.html
+          curl --fail --show-error --silent --location "https://goaxis.in/pay-now.html" --output /tmp/goaxis-pay.html
+          grep -q 'id="pay-button"' /tmp/goaxis-pay.html
+          curl --fail --show-error --silent --location "https://goaxis.in/business-suite-demo.html" | grep -q "document-editor"

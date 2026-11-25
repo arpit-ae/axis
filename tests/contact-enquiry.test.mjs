@@ -1,34 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import worker from "../src/index.js";
-import { notifyEnquiry } from "../src/email.js";
+import { database as makeDb } from "./receipt-db.mjs";
 
-function makeDb() {
-  const leads = [];
-  return {
-    leads,
-    prepare(sql) {
-      let values = [];
-      return {
-        bind(...a) { values = a; return this; },
-        async first() {
-          if (sql.includes("COUNT(*) AS count FROM Leads")) {
-            return { count: leads.filter(lead => lead.email === values[0]).length };
-          }
-          return null;
-        },
-        async run() {
-          if (sql.includes("INSERT INTO Leads")) {
-            const [reference, name, email, phone, service, business_name, business_type, message] = values;
-            leads.push({ reference, name, email, phone, service, business_name, business_type, message });
-            return { meta: { changes: 1 } };
-          }
-          throw new Error("Unexpected query " + sql);
-        }
-      };
-    }
-  };
-}
 const sample = { name: "Example Customer", email: "customer@example.test",
   phone: "9876543210", service: "Business Starter Suite",
   businessName: "Example Business", businessType: "Proprietor",
@@ -54,7 +28,7 @@ test("contact form emails admin and customer separately from contact@goaxis.in",
     assert.equal(data.ok, true);
     assert.equal(data.email_sent, true);
     assert.match(data.reference, /^ENQ-\d{4}-[A-F0-9]+$/);
-    assert.equal(db.leads.length, 1);
+    assert.equal(db.prepare("SELECT count(*) AS n FROM Leads").first().n, 1);
     assert.equal(mails.length, 2);
     assert.deepEqual(mails.map(m => m.to[0]), ["goaxis.in@gmail.com", "customer@example.test"]);
     for (const mail of mails) assert.equal(mail.from, "GOAXIS Contact <contact@goaxis.in>");
@@ -72,15 +46,15 @@ test("customer confirmation escapes any HTML", async () => {
     return new Response(JSON.stringify({ id: "test-id" }), { status: 200 });
   };
   try {
-    await notifyEnquiry({ RESEND_API_KEY: "test-key" }, {
-      reference: "ENQ-2026-123456789A", name: "<img src=x onerror=alert(1)>",
-      email: "test@example.test", phone: "", service: "Website", businessName: "",
-      businessType: "", message: "<script>alert(1)</script>"
-    });
+    await worker.fetch(new Request("https://goaxis.in/api/enquiry", {
+      method: "POST", headers: { "content-type": "application/json" },
+      body: JSON.stringify({ ...sample, name: "<b>Example customer</b>", message: "<script>example</script>" })
+    }), { RESEND_API_KEY: "test-key", DB: makeDb() });
     assert.equal(mails.length, 2);
     assert.doesNotMatch(mails[0].html, /<script>alert/);
     assert.doesNotMatch(mails[1].html, /<img src=x/);
-    assert.match(mails[1].html, /&lt;img/);
+    assert.match(mails[1].html, /&lt;b&gt;/);
+    assert.match(mails[1].html, /&lt;script&gt;/);
   } finally { globalThis.fetch = oldFetch; }
 });
 
@@ -91,7 +65,7 @@ test("missing outbound secret saves reference but does not claim email delivery"
   }), { DB: db });
   const data = await response.json();
   assert.equal(response.status, 200);
-  assert.equal(db.leads.length, 1);
+  assert.equal(db.prepare("SELECT count(*) AS n FROM Leads").first().n, 1);
   assert.equal(data.email_sent, false);
 });
 
@@ -104,7 +78,7 @@ test("repeat email submissions are rate-limited on server", async () => {
     if (i < 3) assert.equal(response.status, 200);
     else assert.equal(response.status, 429);
   }
-  assert.equal(db.leads.length, 3);
+  assert.equal(db.prepare("SELECT count(*) AS n FROM Leads").first().n, 3);
 });
 
 test("cross-origin requests fail before sending any emails", async () => {

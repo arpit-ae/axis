@@ -22,3 +22,6 @@ binding = "DB"
 database_name = "goaxis-consultancy-db"
 database_id = "93b4fc7e-d552-430a-b843-b846c6e28e51"
 migrations_dir = "migrations"
+
+[triggers]
+crons = ["*/5 * * * *"]

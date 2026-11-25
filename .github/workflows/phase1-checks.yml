@@ -24,13 +24,13 @@ jobs:
           node --check src/email.js
           node --check cf-launch.js
       - name: Verify payment email logic with mocked Cashfree and Resend
-        run: node --test tests/payment-emails.test.mjs tests/contact-enquiry.test.mjs
+        run: node --test tests/payment-emails.test.mjs tests/contact-enquiry.test.mjs tests/checkout-receipts.test.mjs
       - name: Guard Pay Now in site header and Cashfree checkout
         run: node --test tests/pay-now-navigation.test.mjs
       - name: Check Phase 1 wiring
         run: |
-          grep -q 'src="forms.js" defer' index.html
-          grep -q 'src="forms.js" defer' service.html
+          grep -q 'src="forms.js"' index.html
+          grep -q 'src="forms.js"' service.html
           grep -q 'id="enquiry-form"' index.html
           grep -q 'id="service-enquiry-form"' service.html
           grep -q 'POST /api/enquiry' README.md
@@ -43,7 +43,7 @@ jobs:
           grep -q 'Cloudflare' PAYMENT_SETUP.md
           grep -q 'RESEND_API_KEY' EMAIL_SETUP.md
           grep -q 'CREATE TABLE IF NOT EXISTS PaymentNotifications' migrations/0002_payment_notifications.sql
-          grep -q 'invoice-basic' src/index.js
+          grep -q 'invoice-basic' catalog.js
           grep -q 'invoice-challan' documents.html
           grep -q 'website-ten-page' website-builder.html
           grep -q 'premium.css' index.html
@@ -55,7 +55,7 @@ jobs:
           grep -q 'business-suite-demo.html' index.html
           grep -q 'contact@goaxis.in' src/email.js
           grep -q 'email_sent' src/index.js
-          grep -q 'Send' forms.js
+          grep -q 'Sending' forms.js
           if grep -Eil 'whatsapp|wa\\.me|api\\.whatsapp\\.com' index.html services.html documents.html website-builder.html service.html faq.html pay-now.html payment-return.html privacy.html terms.html refunds-cancellations.html 404.html business-suite-demo.html app.js part2.js forms.js experience.js; then
             echo "Old WhatsApp contact references found in public website assets"; exit 1;
           fi

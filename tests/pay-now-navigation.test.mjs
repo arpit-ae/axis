@@ -17,10 +17,10 @@ test("Pay Now is directly reachable in the header of every public service page",
     assert.doesNotMatch(html, /https?:\/\/(?:wa\.me|api\.whatsapp\.com)/i, `WhatsApp CTA in ${page}`);
   }
 });
-test("payment page retains working Cashfree checkout form and Pay Now submit button", () => {
+test("payment page retains working Cashfree checkout form and review submit button", () => {
   const html = readFileSync("pay-now.html", "utf8");
   assert.match(html, /id="payment-form"/);
-  assert.match(html, /id="pay-button"[^>]*type="submit">Pay Now/);
+  assert.match(html, /id="pay-button"[^>]*type="submit">Review order/);
   assert.match(html, /sdk\.cashfree\.com\/js\/v3\/cashfree\.js/);
   assert.match(html, /src="cf-launch\.js/);
 });
@@ -28,12 +28,12 @@ test("homepage preserves both clear Pay Now shortcut and email Send enquiry", ()
   const html = readFileSync("index.html", "utf8");
   assert.match(html, /class="button button-secondary hero-pay-now" href="pay-now\.html"/);
   assert.match(html, /id="enquiry-form"/);
-  assert.match(html, /type="submit">Send/);
+  assert.match(html, /type="submit">Review enquiry/);
 });
 test("all-in-one suite includes website, purchase/sales invoices and delivery challan", () => {
   const home = readFileSync("index.html", "utf8");
   const suite = readFileSync("website-builder.html", "utf8");
-  const backend = readFileSync("src/index.js", "utf8");
+  const backend = readFileSync("catalog.js", "utf8");
   assert.match(home, /₹2,000/);
   assert.match(suite, /[Pp]urchase/);
   assert.match(suite, /[Ss]ales/);

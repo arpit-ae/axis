@@ -2,41 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { notifyVerifiedPayment } from "../src/email.js";
 
-function fakeDatabase() {
-  const data = new Map();
-  return {
-    data,
-    prepare(sql) {
-      let args = [];
-      return {
-        bind(...values) { args = values; return this; },
-        async run() {
-          const id = args[0];
-          if (sql.includes("INSERT OR IGNORE INTO PaymentNotifications")) {
-            if (!data.has(id)) data.set(id, { customer_sent_at: null, admin_sent_at: null, processing: false });
-            return { meta: { changes: 1 } };
-          }
-          const row = data.get(id);
-          if (!row) throw new Error("Missing order");
-          if (sql.includes("processing_until=datetime")) {
-            if (row.processing) return { meta: { changes: 0 } };
-            row.processing = true;
-            return { meta: { changes: 1 } };
-          }
-          if (sql.includes("customer_sent_at=CURRENT_TIMESTAMP")) row.customer_sent_at = "sent";
-          if (sql.includes("admin_sent_at=CURRENT_TIMESTAMP")) row.admin_sent_at = "sent";
-          if (sql.includes("processing_until=NULL")) row.processing = false;
-          return { meta: { changes: 1 } };
-        },
-        async first() {
-          const row = data.get(args[0]);
-          if (!row) return null;
-          return { customer_sent_at: row.customer_sent_at, admin_sent_at: row.admin_sent_at };
-        }
-      };
-    }
-  };
-}
+import { database as fakeDatabase } from "./receipt-db.mjs";
+
 function environment(db) {
   return { CASHFREE_APP_ID: "fake-app-id", CASHFREE_SECRET_KEY: "fake-secret",
     RESEND_API_KEY: "fake-resend-key", CASHFREE_ENV: "sandbox", DB: db };
@@ -67,8 +34,8 @@ test("never sends receipts if Cashfree says PENDING after signed success event",
   };
   try {
     const result = await notifyVerifiedPayment(environment(fakeDatabase()), "GOAXIS_TEST_123", "SUCCESS");
-    assert.equal(result.code, 200);
-    assert.equal(result.body.ignored, true);
+    assert.equal(result.code, 503);
+    assert.equal(result.body.pending, true);
     assert.equal(paths.length, 1);
     assert.match(paths[0], /sandbox\.cashfree\.com/);
   } finally { globalThis.fetch = prev; }
@@ -98,7 +65,7 @@ test("sends exactly one payment receipt and one admin notice for repeated verifi
     assert.equal(sent[0].from, "GOAXIS Sales <sales@goaxis.in>");
     assert.match(sent[0].text, /Order ID: GOAXIS_TEST_123/);
     assert.match(sent[0].text, /₹800\.00/);
-    assert.ok(db.data.get("GOAXIS_TEST_123").customer_sent_at);
-    assert.ok(db.data.get("GOAXIS_TEST_123").admin_sent_at);
+    assert.ok(db.prepare("SELECT * FROM PaymentNotifications").first().customer_sent_at);
+    assert.ok(db.prepare("SELECT * FROM PaymentNotifications").first().admin_sent_at);
   } finally { globalThis.fetch = prev; }
 });

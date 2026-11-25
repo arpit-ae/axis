@@ -38,7 +38,7 @@ test("two verified devices can open and update a bill, with independent sessions
     const mail = JSON.parse(options.body);
     assert.deepEqual(mail.to,["orbitgloble@gmail.com"]);
     code = mail.text.match(/\b\d{8}\b/)[0];
-    return new Response("{}",{status:200});
+    return Response.json({id:"test-sign-in-email"});
   });
   function api(path, method="GET", body, cookie="", requestOrigin=origin) {
     return worker.fetch(new Request(origin+"/api/orbit/"+path, {
