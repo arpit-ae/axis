@@ -147,6 +147,7 @@ async function handleEnquiry(request, env, url) {
 }
 
 async function handleCashfreeCreateOrder(request, env, url) {
+  const pickup = !!env.CANTEEN_GATEWAY_SECRET && timingSafeEqual(request.headers.get("X-Canteen-Gateway") || "", env.CANTEEN_GATEWAY_SECRET);
   if (!env.CASHFREE_APP_ID || !env.CASHFREE_SECRET_KEY) {
     return json({ ok: false, error: "Cashfree production credentials are not configured in Cloudflare yet." }, 503);
   }
@@ -192,7 +193,7 @@ async function handleCashfreeCreateOrder(request, env, url) {
 
   if (name.length < 2) return json({ ok: false, error: "Please enter your full name." }, 400);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) return json({ ok: false, error: "Please enter a valid email address." }, 400);
-  if (!/^[6-9]\d{9}$/.test(phone)) return json({ ok: false, error: "Enter a valid 10-digit Indian mobile number starting with 6, 7, 8 or 9. You may include +91." }, 400);
+  if ((!pickup || phone) && !/^[6-9]\d{9}$/.test(phone)) return json({ ok: false, code: "PHONE_REQUIRED", error: "Enter a valid 10-digit Indian mobile number." }, 400);
   if (!purpose) return json({ ok: false, error: "Please enter the payment purpose." }, 400);
   if (!Number.isFinite(amount) || amount < 1 || amount > 1000000) {
     return json({ ok: false, error: "Payment amount must be between ₹1 and ₹10,00,000." }, 400);
@@ -207,9 +208,9 @@ async function handleCashfreeCreateOrder(request, env, url) {
     address[key] = clean(rawAddress[key], max);
     if (String(rawAddress[key] ?? "").trim().length > max) return json({ ok: false, error: "A delivery address field is too long." }, 400);
   }
-  if (address.line1.length < 3 || address.city.length < 2 || address.state.length < 2 || address.country.length < 2 ||
+  if (!pickup && (address.line1.length < 3 || address.city.length < 2 || address.state.length < 2 || address.country.length < 2 ||
       !/^[A-Za-z0-9][A-Za-z0-9 -]{1,15}$/.test(address.postal) ||
-      (/^(India|IN)$/i.test(address.country) && !/^[1-9]\d{5}$/.test(address.postal))) {
+      (/^(India|IN)$/i.test(address.country) && !/^[1-9]\d{5}$/.test(address.postal)))) {
     return json({ ok: false, error: "Enter the delivery street, city, state, country and a valid postal code." }, 400);
   }
   const requestId = data.request_id ?? crypto.randomUUID();
@@ -252,11 +253,11 @@ async function handleCashfreeCreateOrder(request, env, url) {
       customer_id: "CUST_" + orderId.slice(7),
       customer_name: name,
       customer_email: email,
-      customer_phone: `+91${phone}`
+      ...(phone ? {customer_phone: `+91${phone}`} : {})
     },
     order_note: purpose.slice(0, 200),
     order_meta: {
-      return_url: `${siteUrl}/payment-return.html?order_id={order_id}#receipt=${saved.receipt_token}`,
+      return_url: pickup ? `${siteUrl}/canteen/orders` : `${siteUrl}/payment-return.html?order_id={order_id}#receipt=${saved.receipt_token}`,
       notify_url: `${siteUrl}/api/cashfree/webhook`
     }
   };
@@ -279,6 +280,9 @@ async function handleCashfreeCreateOrder(request, env, url) {
       // Never log the full Cashfree response: validation messages can contain customer phone/email data.
       const code = typeof result?.code === "string" ? result.code.slice(0, 120) : "missing_payment_session_id";
       console.error("Cashfree create order failed", { httpStatus: response.status, code });
+      if (pickup && !phone && response.status === 400 && /phone/i.test(code+" "+String(result.message||""))) {
+        return json({ok:false,code:"PHONE_REQUIRED",error:"Cashfree requires your mobile number for this transaction."},400);
+      }
       if (code === "customer_details.customer_phone_invalid") {
         return json({ ok: false, error: "Enter a valid 10-digit Indian mobile number starting with 6, 7, 8 or 9. You may include +91." }, 400);
       }
