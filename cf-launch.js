@@ -8,6 +8,16 @@ const params = new URLSearchParams(location.search);
 const packageId = params.get("package") || "";
 const field = name => form.elements.namedItem(name);
 const selected = Object.hasOwn(packages, packageId) ? packages[packageId] : null;
+const picker = document.getElementById("choose-package");
+if (picker) {
+  picker.value = selected ? packageId : "";
+  picker.addEventListener("change", () => {
+    const next = new URL(location.href);
+    next.search = ""; next.hash = "";
+    if (picker.value) next.searchParams.set("package", picker.value);
+    location.assign(next.href);
+  });
+}
 if (packageId && !selected) {
   button.disabled = true;
   message.textContent = "This package is unavailable. Choose a current package from the website.";
