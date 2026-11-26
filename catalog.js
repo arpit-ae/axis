@@ -1,4 +1,9 @@
 export const packages = {
+  "udyam": { amount: 100, title: "Udyam / MSME Registration Assistance" },
+  "gst": { amount: 499, title: "GST Registration Assistance" },
+  "fssai": { amount: 200, title: "FSSAI Registration Assistance (Priority)" },
+  "iec": { amount: 700, title: "IEC Certificate Assistance" },
+  "website-five-page": { amount: 1000, title: "5-Page Business Website Development" },
   "invoice-basic": { amount: 500, title: "Invoice Template" },
   "invoice-purchase-sale": { amount: 800, title: "Purchase + Sales Invoice Templates" },
   "invoice-challan": { amount: 1000, title: "Purchase + Sales Invoice + Delivery Challan Templates" },
